@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
-polygons = np.load("rr1133-mmh255/arm_polygons.npy", allow_pickle= True)
+polygons = np.load("rr1133-mmh255/collision_checking_polygons.npy", allow_pickle= True)
 
 #given a polygon as numpy array, get its edges as an array
 def get_edges(polygon):

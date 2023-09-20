@@ -1,7 +1,7 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
-polygons = np.load("rr1133-mmh255/arm_polygons.npy", allow_pickle= True)
+polygons = np.load("rr1133-mmh255/collision_checking_polygons.npy", allow_pickle= True)
 polygon1 = np.vstack((polygons[0], polygons[0][0]))
 polygon2 = np.vstack((polygons[1], polygons[1][0]))
 polygon3 = np.vstack((polygons[2], polygons[2][0]))
