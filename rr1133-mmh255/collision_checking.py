@@ -6,7 +6,7 @@ polygons = np.load("rr1133-mmh255/collision_checking_polygons.npy", allow_pickle
 #given a polygon as numpy array, get its edges as an array
 def get_edges(polygon):
     V = polygon.shape[0]
-    edges = [[polygon[i], polygon[(i + 1) % V]] for i in range(V)]
+    edges = [[polygon[i], polygon[i + 1]] for i in range(V - 1)]
     return edges
 
 #calculate determinant of 2 x 2 matrix
@@ -70,7 +70,7 @@ def collides(poly1, poly2):
     #Check for Edge Intersection between both polygons
     poly1_edges = get_edges(poly1)
     poly2_edges = get_edges(poly2)
-    
+
     for edge1 in poly1_edges:
         for edge2 in poly2_edges:
             if (edge_intersect(edge1, edge2)):
@@ -88,13 +88,28 @@ polygon1 = polygons[0]
 polygon2 = polygons[1]
 polygon3 = polygons[2]
 
+print("Printing Polygon 1")
 print(polygon1)
 print("-------------------------------")
+
+print("Printing Polygon 2")
 print(polygon2)
 print("-------------------------------")
+
+print("Printing Polygon 3")
 print(polygon3)
 print("-------------------------------")
+print("-------------------------------")
+print("-------------------------------")
 
+print("Testing Collision among Polygon 1 and 2")
 print(collides(polygon1, polygon2))
+print("-------------------------------")
+
+print("Testing Collision among Polygon 1 and 3")
 print(collides(polygon1, polygon3))
+print("-------------------------------")
+
+print("Testing Collision among Polygon 2 and 3")
 print(collides(polygon3, polygon2))
+print("-------------------------------")
