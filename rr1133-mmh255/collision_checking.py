@@ -1,8 +1,6 @@
 import numpy as np 
 import matplotlib.pyplot as plt
 
-polygons = np.load("rr1133-mmh255/collision_checking_polygons.npy", allow_pickle= True)
-
 #given a polygon as numpy array, get its edges as an array
 def get_edges(polygon):
     V = polygon.shape[0]
@@ -13,28 +11,48 @@ def get_edges(polygon):
 def determinant(A):
     return (A[1, 1] * A[0, 0]) - (A[0, 1] * A[1, 0])
 
+#calculate Euclidean Distance between two points
+def euclidean_distance(point1, point2):
+    return np.sqrt((point2[1] - point1[1]) ** 2 + (point2[0] - point1[0]) ** 2)
+
+#determine if edge is on point
+def point_on_edge(edge, point, epsilon = 1e-50):
+    return (euclidean_distance(edge[0], point) + euclidean_distance(edge[1], point) - euclidean_distance(edge[0], edge[1])) < epsilon
+
 #Given two polygons, check to see if a point is contained within a polygon
 def point_contained(poly, point):
     center = poly[0]
     angles = []
+    special_case_phi = False
     
-    for vertex in poly[1: ]:
+    for vertex in poly[1: -1]:
         relative_point = vertex - center
         phi = np.rad2deg(np.arctan2(relative_point[1], relative_point[0]))
-        phi = phi + 360 if phi < 0 else phi            
+        phi = phi + 360 if phi < 0 else phi
+        
+        if (len(angles) >= 1 and phi < angles[-1]):
+            phi += 360  
+            special_case_phi = True
+            
         angles.append(phi)
     
     relative_point = point - center
     point_phi = np.rad2deg(np.arctan2(relative_point[1], relative_point[0]))
-    point_phi = point_phi + 360 if point_phi < 0 else point_phi
+    point_phi = point_phi + 360 if point_phi < 0 or special_case_phi else point_phi
     
     index = np.searchsorted(angles, point_phi)
-    if ((index > len(angles) and point_phi > angles[-1]) or (index == 0 and point_phi < angles[0])):
+    if ((index == len(angles) and point_phi > angles[-1]) or (index == 0 and point_phi < angles[0])):
         return False
     
     ray = [center, point]
-    edge = [poly[0], poly[1]] if index == 0 else [poly[index - 1], poly[index]]    
-    return edge_intersect(ray, edge)
+    if index == 0:
+        edge = [poly[1], poly[2]]
+    elif index == len(angles):
+        edge = [poly[-3], poly[-2]]
+    else:
+        edge = [poly[index], poly[index + 1]]
+            
+    return (not edge_intersect(ray, edge)) or point_on_edge(edge, point)
         
 
 #Given two edges, determine if they intersect using parameterization and Cramer's Rule
@@ -81,35 +99,3 @@ def collides(poly1, poly2):
 ## Optimized Approach for Detecting Polygon Collision
 def collides_optimized(poly1, poly2):
     pass
-
-
-#Test Code to test functions I wrote
-polygon1 = polygons[0]
-polygon2 = polygons[1]
-polygon3 = polygons[2]
-
-print("Printing Polygon 1")
-print(polygon1)
-print("-------------------------------")
-
-print("Printing Polygon 2")
-print(polygon2)
-print("-------------------------------")
-
-print("Printing Polygon 3")
-print(polygon3)
-print("-------------------------------")
-print("-------------------------------")
-print("-------------------------------")
-
-print("Testing Collision among Polygon 1 and 2")
-print(collides(polygon1, polygon2))
-print("-------------------------------")
-
-print("Testing Collision among Polygon 1 and 3")
-print(collides(polygon1, polygon3))
-print("-------------------------------")
-
-print("Testing Collision among Polygon 2 and 3")
-print(collides(polygon3, polygon2))
-print("-------------------------------")

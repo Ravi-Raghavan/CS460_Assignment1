@@ -1,0 +1,7 @@
+    # print(f"Polygon: {poly}")
+    # print(f"Point: {point}")
+    # print(f"Angles: {angles}")
+    # print(f"Phi: {point_phi}")
+    # print(f"Index: {index}")
+    # print(f"Ray: {ray}")
+    # print(f"Edge: {edge}")

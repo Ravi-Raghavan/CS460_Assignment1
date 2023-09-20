@@ -1,1 +1,1 @@
-collision_checking_polygons
+print(collides(polygons[18], polygons[4]))
