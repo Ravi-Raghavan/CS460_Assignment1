@@ -30,7 +30,7 @@ def rotate_about_center(rectangle, event):
 
 def translate_rectangle(rectangle, event):
     global center_point
-    r = 0.05
+    r = 0.1
     
     if event == "right":
         delta_cx = r * np.cos(np.deg2rad(rotation_angle))
