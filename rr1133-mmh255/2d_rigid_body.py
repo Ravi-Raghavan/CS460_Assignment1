@@ -38,7 +38,7 @@ def translate_rectangle(rectangle, event):
     global center_point
     print("------------------TRANSLATION-----------------------")
     print(f"Start, Rotation Angle: {rotation_angle}, Center Point: {center_point}, bottom_right: {rectangle[0]}, bottom_left: {rectangle[-1]}")
-    r = 0.2
+    r = 0.05
     delta_center_point = None 
     
     if event == "right":
@@ -102,15 +102,19 @@ patch = ax.add_patch(rec0)
 plt.plot(coords[0],coords[1], marker='o', markersize=3, color="green")
 
 # Event handler to change the rotation angle
-def change_rotation(event):
-    global rotation_angle
+def change_rotation_or_translation(event):
+    global rectangle, rotation_angle
     if event.key == "up" or event.key == 'down':
-        rec0.set_xy(rotate_about_center(rectangle, event.key))
+        rectangle = rotate_about_center(rectangle, event.key)
+        print(f"RECTANGLE: {rectangle}")
+        rec0.set_xy(rectangle)
     elif event.key == 'right' or event.key == 'left':
-        rec0.set_xy(translate_rectangle(rectangle, event.key))
+        rectangle = translate_rectangle(rectangle, event.key)
+        print(f"RECTANGLE: {rectangle}")
+        rec0.set_xy(rectangle)
     
     f.canvas.draw()
 
 # Connect keyboard events to event handlers
-f.canvas.mpl_connect('key_press_event', change_rotation)
+f.canvas.mpl_connect('key_press_event', change_rotation_or_translation)
 plt.show()
