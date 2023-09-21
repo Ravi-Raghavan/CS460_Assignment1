@@ -30,7 +30,18 @@ def rotate_about_center(rectangle, event):
 
 def translate_rectangle(rectangle, event):
     global center_point
-    center_point += np.array([0.1, 0]) if event == "right" else np.array([-0.1, 0])
+    r = 0.05
+    
+    if event == "right":
+        delta_cx = r * np.cos(np.deg2rad(rotation_angle))
+        delta_cy = r * np.sin(np.deg2rad(rotation_angle))
+        center_point = np.array([delta_cx, delta_cy])
+    
+    elif event == "left":
+        delta_cx = r * np.cos(np.deg2rad(rotation_angle - 180))
+        delta_cy = r * np.sin(np.deg2rad(rotation_angle - 180))
+        center_point = np.array([delta_cx, delta_cy])
+
     return rectangle + center_point
      
 #Rotate and Translate the Rectangle by a given angle and translation amount
