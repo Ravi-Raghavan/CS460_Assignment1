@@ -5,10 +5,6 @@ f,ax = plt.subplots(dpi = 100)
 ax.set_aspect("equal")
 coords = [2.5,2] #center of rectangle 
 
-tr = matplotlib.transforms.Affine2D().rotate_deg_around(coords[0],coords[1], 45)
-ts = ax.transData
-t = tr + ts
-
 #Original Rectangle Patch
 rec0 = matplotlib.patches.Rectangle((1,1),3,2,linewidth=1,edgecolor='r',facecolor='none')
 ax.add_patch(rec0)
