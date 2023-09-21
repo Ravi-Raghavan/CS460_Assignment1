@@ -1,6 +1,8 @@
 import matplotlib.pyplot as plt
 import matplotlib
 
+print(f"matplotlib version: {matplotlib.__version__}")
+
 f,ax = plt.subplots(dpi = 100)
 ax.set_aspect("equal")
 coords = [2.5,2] #center of rectangle 
