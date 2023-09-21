@@ -27,40 +27,6 @@ def generate_rectangle():
     return center_point, bottom_right, top_right, top_left, bottom_left
 
 center_point, bottom_right, top_right, top_left, bottom_left = generate_rectangle();
-print(bottom_right, top_right, top_left, bottom_left)
-
-print(np.linalg.norm(bottom_right - center_point) * 2)
-print(np.linalg.norm(top_right - center_point) * 2)
-print(np.linalg.norm(top_left - center_point) * 2)
-print(np.linalg.norm(bottom_left - center_point) * 2)
-
-print("------------------------------------------------")
-
-print(np.linalg.norm(bottom_right - top_right))
-print(np.linalg.norm(top_right - top_left))
-print(np.linalg.norm(top_left - bottom_left))
-print(np.linalg.norm(bottom_left - bottom_right))
-
-print("------------------------------------------------")
-
-slope1 = (top_right[1] - bottom_right[1]) / (top_right[0] - bottom_right[0])
-slope2 = (bottom_left[1] - bottom_right[1]) / (bottom_left[0] - bottom_right[0])
-print(f"{slope1}, {slope2}, {slope1 * slope2}")
-
-slope1 = (top_left[1] - bottom_left[1]) / (top_left[0] - bottom_left[0])
-slope2 = (bottom_right[1] - bottom_left[1]) / (bottom_right[0] - bottom_left[0])
-print(f"{slope1}, {slope2}, {slope1 * slope2}")
-
-slope1 = (top_right[1] - top_left[1]) / (top_right[0] - top_left[0])
-slope2 = (bottom_left[1] - top_left[1]) / (bottom_left[0] - top_left[0])
-print(f"{slope1}, {slope2}, {slope1 * slope2}")
-
-slope1 = (top_left[1] - top_right[1]) / (top_left[0] - top_right[0])
-slope2 = (bottom_right[1] - top_right[1]) / (bottom_right[0] - top_right[0])
-print(f"{slope1}, {slope2}, {slope1 * slope2}")
-
-print("------------------------------------------------")
-
 ax.fill([vertex[0] for vertex in [bottom_right, top_right, top_left, bottom_left]], [vertex[1] for vertex in [bottom_right, top_right, top_left, bottom_left]], alpha=.25, fc='red', ec='blue')
 
 for index in range(len(polygons)):
