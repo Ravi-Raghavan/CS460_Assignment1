@@ -21,6 +21,7 @@ def rotate_about_center(rectangle, event):
     global rotation_angle, center_point
     delta_rotation_angle = 10 if event == "up" else -10
     rotation_angle += delta_rotation_angle
+    rotation_angle = rotation_angle % 360
     
     rectangle = generate_rectangle()
     angle = np.deg2rad(rotation_angle)
@@ -79,9 +80,9 @@ plt.plot(coords[0],coords[1], marker='o', markersize=3, color="green")
 def change_rotation(event):
     global rotation_angle
     if event.key == "up" or event.key == 'down':
-        rotate_about_center(rectangle, event.key)
+        rec0.set_xy(rotate_about_center(rectangle, event.key))
     elif event.key == 'right' or event.key == 'left':
-        translate_rectangle(rectangle, event.key)
+        rec0.set_xy(translate_rectangle(rectangle, event.key))
 
 # Connect keyboard events to event handlers
 f.canvas.mpl_connect('key_press_event', change_rotation)
