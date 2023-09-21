@@ -6,21 +6,38 @@ from collision_checking import *
 print(f"matplotlib version: {matplotlib.__version__}")
 polygons = np.load("rr1133-mmh255/2d_rigid_body.npy", allow_pickle= True)
 
-ROTATION_INCREMENT = 10
 rotation_angle = None
 center_point = None
 
 f,ax = plt.subplots(dpi = 100)
 ax.set_aspect("equal")
+ax.set_xlim(-0.01, 2.01)
+ax.set_ylim(-0.01, 2.01)
+
 
 for index in range(len(polygons)):
     polygon = polygons[index]
     ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='white', ec='black')
+
+def is_rectangle_on_boundary(rectangle):
+    for vertex in rectangle:
+        if (vertex[0] <= 0 or vertex[0] >= 2):
+            return True
+        
+        if vertex[1] <= 0 or vertex[1] >= 2:
+            return True
+    
+    return False
     
 def rotate_about_center(rectangle, event):
     global rotation_angle, center_point
+    original_rectangle = rectangle
+    original_rotation_angle = rotation_angle
+    original_center_point = center_point 
+    
     print("------------------ROTATION-----------------------")
     print(f"Start, Rotation Angle: {rotation_angle}, Center Point: {center_point}, bottom_right: {rectangle[0]}, bottom_left: {rectangle[-1]}")
+    
     delta_rotation_angle = 10 if event == "up" else -10
     rotation_angle += delta_rotation_angle
     rotation_angle = rotation_angle % 360
@@ -29,15 +46,26 @@ def rotate_about_center(rectangle, event):
     angle = np.deg2rad(rotation_angle)
     rotation_matrix = np.array([[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]])  
     rectangle = (rotation_matrix @ rectangle.T).T + center_point
+    
+    if (collides_with_other_polygons(rectangle) or is_rectangle_on_boundary(rectangle)):
+        rectangle = original_rectangle
+        rotation_angle = original_rotation_angle
+        center_point = original_center_point
+    
     print(f"End, Rotation Angle: {rotation_angle}, Center Point: {center_point}, bottom_right: {rectangle[0]}, bottom_left: {rectangle[-1]}")
     print("-------------------------------------------------")
 
     return rectangle
 
 def translate_rectangle(rectangle, event):
-    global center_point
+    global rotation_angle, center_point
+    original_rectangle = rectangle
+    original_rotation_angle = rotation_angle
+    original_center_point = center_point 
+    
     print("------------------TRANSLATION-----------------------")
     print(f"Start, Rotation Angle: {rotation_angle}, Center Point: {center_point}, bottom_right: {rectangle[0]}, bottom_left: {rectangle[-1]}")
+    
     r = 0.05
     delta_center_point = None 
     
@@ -53,6 +81,12 @@ def translate_rectangle(rectangle, event):
 
     center_point += delta_center_point
     rectangle = rectangle + delta_center_point
+    
+    if (collides_with_other_polygons(rectangle) or is_rectangle_on_boundary(rectangle)):
+        rectangle = original_rectangle
+        rotation_angle = original_rotation_angle
+        center_point = original_center_point
+    
     print(f"End, Rotation Angle: {rotation_angle}, Center Point: {center_point}, bottom_right: {rectangle[0]}, bottom_left: {rectangle[-1]}")
     print("-------------------------------------------------")
     
