@@ -1,9 +1,16 @@
 import numpy as np 
 import matplotlib.pyplot as plt
+from collision_checking import *
 
 polygons = np.load("rr1133-mmh255/2d_rigid_body.npy", allow_pickle= True)
 fig, ax = plt.subplots(dpi = 100)
 ax.set_aspect("equal")
+
+def on_press(event):
+    print('press', event.key, event.xdata, event.ydata)
+
+
+fig.canvas.mpl_connect('key_press_event', on_press)
 
 def generate_rectangle():
     center_point = np.array([np.random.uniform(0, 2), np.random.uniform(0, 2)])
@@ -26,7 +33,19 @@ def generate_rectangle():
     
     return center_point, bottom_right, top_right, top_left, bottom_left
 
+def collides_with_other_polygons(rectangle):
+    for polygon in polygons:
+        if (collides(polygon, rectangle)):
+            return True
+    return False
+
 center_point, bottom_right, top_right, top_left, bottom_left = generate_rectangle();
+rectangle = np.vstack((bottom_right, top_right, top_left, bottom_left))
+
+while (collides_with_other_polygons(rectangle)):
+    center_point, bottom_right, top_right, top_left, bottom_left = generate_rectangle();
+    rectangle = np.vstack((bottom_right, top_right, top_left, bottom_left))
+
 ax.fill([vertex[0] for vertex in [bottom_right, top_right, top_left, bottom_left]], [vertex[1] for vertex in [bottom_right, top_right, top_left, bottom_left]], alpha=.25, fc='red', ec='blue')
 
 for index in range(len(polygons)):

@@ -1,1 +1,1 @@
-print(collides(polygons[18], polygons[4]))
+# Event handler to change the rotation angle
