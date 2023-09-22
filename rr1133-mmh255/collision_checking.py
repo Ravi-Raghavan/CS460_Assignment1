@@ -99,6 +99,50 @@ def collides(poly1, poly2):
 
     return False
 
+
+#Check for collision between two bounding boxes
+def check_collision(bbox1, bbox2):
+    '''Check if two bounding boxes collide'''
+    return not (bbox1[1][0] < bbox2[0][0] or 
+                bbox1[0][0] > bbox2[1][0] or 
+                bbox1[1][1] < bbox2[0][1] or 
+                bbox1[0][1] > bbox2[1][1])
+    
+
+#returns True if a collision has been detected, else returns False
+def SAT(poly1, poly2):
+    poly1_edges = get_edges(poly1)
+    poly2_edges = get_edges(poly2)
+    edges = poly1_edges + poly2_edges
+    
+    for edge in edges:
+        edge_vector = edge[1] - edge[0]
+        normal_vector = np.array([-1 * edge_vector[1], edge_vector[0]])
+        normal_vector /= np.linalg.norm(normal_vector)
+        
+        poly1_projections = []
+        poly2_projections = []
+        
+        #Compute Projections
+        for vertex in poly1:
+            projection = np.dot(vertex, normal_vector) * normal_vector
+            poly1_projections.append(projection[0])
+        
+        for vertex in poly2:
+            projection = np.dot(vertex, normal_vector) * normal_vector
+            poly2_projections.append(projection[0])
+        
+        poly1_projections = np.sort(np.array(poly1_projections))
+        poly2_projections = np.sort(np.array(poly2_projections))
+        
+        if (poly2_projections[-1] < poly1_projections[0] or poly2_projections[0] > poly1_projections[-1]):
+            return False
+    
+    return True
+
 ## Optimized Approach for Detecting Polygon Collision
 def collides_optimized(poly1, poly2):
-    pass
+    bounding_boxes = [np.array([np.min(polygon, axis=0), np.max(polygon, axis=0)]) for polygon in [poly1, poly2]]
+    if (check_collision(bounding_boxes[0], bounding_boxes[1])):
+        return SAT(poly1, poly2)
+    
