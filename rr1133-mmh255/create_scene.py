@@ -4,22 +4,37 @@ from scipy.spatial import ConvexHull
 import random
 import math
 
-# receive input about scene -> I need to change this to read from a file lol
+# get user input 
 P = int(input('number of polygons: '))
 nmin = int(input('minimum vertices: '))
 nmax = int(input('maximum vertices: '))
 rmin = float(input('minimum radius: '))
 rmax = float(input('maximum radius: '))
 
-# store polygons
-polygons = []
+# construct polygonal map
+def constructScene(P):
+    polygons = []
+    convexPolygons = []
 
-# create polygon P times
-for _ in range(P):
-    # store vertices
-    polygon = []
+    # construct P polygons
+    for _ in range(P):
+        polygons.append(constructPolygon(nmin, nmax, rmin, rmax))
 
-    # get center for polygon
+    # check each polygon is convex 
+    for i in polygons:
+        makeConvex(i, convexPolygons)
+    
+    # save polygons to .npy file
+    polygons_save = np.array(convexPolygons,dtype = object)
+    np.save('polygons_scene.npy', polygons_save)
+
+    # plot the polygons
+    visualize(convexPolygons)
+
+# construct polygon using ranges for vertices and radii
+def constructPolygon(nmin, nmax, rmin, rmax):
+    polygon =[]
+     # get center for polygon
     x_center = random.uniform(0,2)
     y_center = random.uniform(0,2)
 
@@ -41,27 +56,29 @@ for _ in range(P):
 
         # add vertex to polygon
         polygon.append((x,y))
-    polygons.append(np.array(polygon))
+    return polygon
 
-# check if polygons are convex using ConvexHull()
-convexPolygons = []
-for i in polygons:
-   hull = ConvexHull(i)
-   #extract each vertex from hull
-   vertices = [i[j] for j in hull.vertices]   
-   convexPolygons.append(np.array(vertices))
+# makes a polygon convex using ConvexHull
+def makeConvex(polygon, convexPolygons):
+    # get indexes of points that make polygon convex
+    hull = ConvexHull(polygon)
+    # extract each vertex from hull 
+    vertices = [polygon[j] for j in hull.vertices]   
+    convexPolygons.append(vertices)
 
-# plot polygons
-fig, ax = plt.subplots(figsize=(7,7), dpi=100)
-for i in convexPolygons:
-    # save polygon -> figuring out how to save the polygons
-    #np.save('polygon_scene.npy', i)
-    x_coordinates, y_coordinates = zip(*i)
-    #close polygon
-    x_coordinates = np.append(x_coordinates, x_coordinates[0])
-    y_coordinates = np.append(y_coordinates, y_coordinates[0])
+# plots the convexPolygon 
+def visualize(convexPolygons):
+    fig, ax = plt.subplots(figsize=(7,7), dpi=100)
+    for i in convexPolygons:
+         # store x and y coordinates in seperate arrays
+         x_coordinates, y_coordinates = zip(*i)
+         # closes polygon
+         x_coordinates = np.append(x_coordinates, x_coordinates[0])
+         y_coordinates = np.append(y_coordinates, y_coordinates[0])
+         # plot points
+         ax.plot(x_coordinates, y_coordinates)
+    ax.set(xlim = (0,2), ylim =(0,2))
+    ax.set_aspect('equal')
+    plt.show() 
 
-    ax.plot(x_coordinates, y_coordinates)
-
-ax.set(xlim = (0,2), ylim =(0,2))
-plt.show()
+constructScene(P)
