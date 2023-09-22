@@ -51,6 +51,7 @@ def point_contained(poly, point):
     if (point_phi == angles[index]):
         return euclidean_distance(center, point) <= euclidean_distance(center, poly[index + 1])
     
+    #If not, we must do a ray, edge check
     ray = [center, point]
     edge = [poly[index], poly[index + 1]]
             
