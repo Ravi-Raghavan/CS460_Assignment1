@@ -1,1 +1,1 @@
-from collision_checking import *
+        ax.legend()
