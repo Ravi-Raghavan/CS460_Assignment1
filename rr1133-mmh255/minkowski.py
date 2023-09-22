@@ -86,7 +86,7 @@ class MinkowskiPlot:
                 np.append(hull.points[hull.vertices, 1], hull.points[hull.vertices[0], 1]), color='green')
         ax.plot(0, 0, 'bo', label='Origin')
 
-        # ax.legend()
+        ax.legend()
         # ax.grid(True)
         # ax.set_aspect('equal')  # Set the aspect ratio of the plot
         # plt.show()
