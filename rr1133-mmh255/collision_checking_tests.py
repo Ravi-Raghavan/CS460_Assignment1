@@ -12,7 +12,7 @@ for index1 in range(len(polygons)):
     for index2 in range(len(polygons)):
         if (index1 == index2):
             continue
-        if (collides(polygon, polygons[index2])):
+        if (collides_optimized(polygon, polygons[index2])):
             collision_polygon = True
             break
     

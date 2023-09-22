@@ -128,7 +128,7 @@ class RigidBody:
     #Check to see if the rigid body collides with other polygons in our list
     def collides_with_other_polygons(self, rectangle):
         for polygon in self.polygons:
-            if (collides(polygon, rectangle)):
+            if (collides_optimized(polygon, rectangle)):
                 return True
         return False
     
