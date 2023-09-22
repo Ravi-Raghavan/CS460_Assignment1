@@ -23,13 +23,16 @@ def point_on_edge(edge, point, epsilon = 1e-50):
 def point_contained(poly, point):
     center = poly[0]
     angles = []
-    special_case_phi = False
+    special_case_phi = False #Case where our angles go from 4th quadrant to 1st quadrant
     
     for vertex in poly[1: -1]:
         relative_point = vertex - center
         phi = np.rad2deg(np.arctan2(relative_point[1], relative_point[0]))
+        
+        #keep value of phi between 0 and 360
         phi = phi + 360 if phi < 0 else phi
         
+        #If values start to decrease, we know we are going from 4th quadrant to 1st quadrant. In this case, simply add 360
         if (len(angles) >= 1 and phi < angles[-1]):
             phi += 360  
             special_case_phi = True
@@ -41,16 +44,15 @@ def point_contained(poly, point):
     point_phi = point_phi + 360 if point_phi < 0 or special_case_phi else point_phi
     
     index = np.searchsorted(angles, point_phi)
-    if ((index == len(angles) and point_phi > angles[-1]) or (index == 0 and point_phi < angles[0])):
+    if (index == len(angles) or (index == 0 and point_phi < angles[0])):
         return False
     
+    #If angle matches exactly, shortcut check
+    if (point_phi == angles[index]):
+        return euclidean_distance(center, point) <= euclidean_distance(center, poly[index + 1])
+    
     ray = [center, point]
-    if index == 0:
-        edge = [poly[1], poly[2]]
-    elif index == len(angles):
-        edge = [poly[-3], poly[-2]]
-    else:
-        edge = [poly[index], poly[index + 1]]
+    edge = [poly[index], poly[index + 1]]
             
     return (not edge_intersect(ray, edge)) or point_on_edge(edge, point)
         
