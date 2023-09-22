@@ -13,35 +13,25 @@ f,ax = plt.subplots(dpi = 100)
 ax.set_aspect("equal")
 
 #set axis limits for x and y axes
-ax.set_xlim(-1.5, 3.5)
-ax.set_ylim(-1.5, 3.5)
+ax.set_xlim(-0.1, 2.2)
+ax.set_ylim(-0.1, 2.2)
 
 class MinkowskiPlot:
-    def __init__(self, f, ax):
+    def __init__(self, f, ax, rotation_angle):
         #Store figure and axes as instance variables
         self.f = f
         self.ax = ax
+        self.rotation_angle = rotation_angle
         
         #Load Polygon Data
         self.polygons = np.load("rr1133-mmh255/2d_rigid_body.npy", allow_pickle= True)
 
-        #Randomly Generate Starting Configuration for Rectangle
-        default_rectangle = self.generate_rectangle() #Generate a rectangle with width w and height h to be centered around the origin
-        self.rectangle = self.random_rectangle_configuration(default_rectangle)
-        while (self.collides_with_other_polygons(self.rectangle) or self.is_rectangle_on_boundary(self.rectangle)):
-            self.rectangle = self.random_rectangle_configuration(default_rectangle)
-        
-        #Original Rectangle Patch
-        self.rectangle_patch = matplotlib.patches.Polygon(self.rectangle, closed=True, facecolor = 'none', edgecolor='r')
-        self.ax.add_patch(self.rectangle_patch)
-
-        # Plot centroid of rectangle
-        self.body_centroid = self.ax.plot(self.center_point[0],self.center_point[1], marker='o', markersize=3, color="green")
+        #Generate Starting Configuration for Rectangle with configuration at origin
+        self.rectangle = self.random_rectangle_configuration(self.generate_rectangle())        
              
     #Rotate and Translate the Default Rectangle by a given angle and translation amount
     def random_rectangle_configuration(self, rectangle):
-        self.rotation_angle = np.random.choice(a = np.array([0, 45, 90]))
-        self.center_point = np.array([np.random.uniform(0, 2), np.random.uniform(0, 2)])
+        self.center_point = np.array([0, 0])
         angle = np.deg2rad(self.rotation_angle)
         rotation_matrix = np.array([[np.cos(angle), -1 * np.sin(angle)], [np.sin(angle), np.cos(angle)]])    
         return (rotation_matrix @ rectangle.T).T + self.center_point
@@ -58,63 +48,30 @@ class MinkowskiPlot:
 
         return np.vstack((bottom_right, top_right, top_left, bottom_left))
 
-    #Check to see if the rigid body collides with other polygons in our list
-    def collides_with_other_polygons(self, rectangle):
-        for polygon in self.polygons:
-            if (collides(polygon, rectangle)):
-                return True
-        return False
-    
-    #Returns true if rectangle is on boundary
-    def is_rectangle_on_boundary(self, rectangle):
-        for vertex in rectangle:
-            if vertex[0] <= 0 or vertex[0] >= 2 or vertex[1] <= 0 or vertex[1] >= 2:
-                return True
-        
-        return False
-    
-    def visualize_minkowski(self, A, B, S, ax):
-        """Visualize polygons A, B, and their Minkowski sum S."""
-        # plt.figure(figsize=(8, 8))
-
-        ax.plot(np.append(A[:, 0], A[0, 0]), np.append(A[:, 1], A[0, 1]), label="A", color='blue')
-        ax.plot(np.append(B[:, 0], B[0, 0]), np.append(B[:, 1], B[0, 1]), label="B", color='red')
-
+    def visualize_minkowski(self, S, ax):
+        """Visualize the Minkowski sum S."""
         hull = ConvexHull(S)
-        ax.plot(hull.points[hull.vertices, 0], hull.points[hull.vertices, 1], label="Minkowski Sum", color='green')
         ax.plot(np.append(hull.points[hull.vertices, 0], hull.points[hull.vertices[0], 0]), 
                 np.append(hull.points[hull.vertices, 1], hull.points[hull.vertices[0], 1]), color='green')
-        ax.plot(0, 0, 'bo', label='Origin')
 
-        # ax.legend()
-        # ax.grid(True)
-        # ax.set_aspect('equal')  # Set the aspect ratio of the plot
-        # plt.show()
-
-    #compute minkowski sum for set A and B
-    def minkowski_sums(self, A, B):
+    #algorithm to compute minkowski sum
+    def minkowski_algorithm(self, polygon):
+        P = polygon
+        Q = -1 * self.rectangle
+        
         S = []
         
-        for A_vector in A:
-            for B_vector in B:
-                S.append(A_vector + B_vector)
-        
-        return np.array(S)
-
-    #compute minkowski difference for set A and B
-    def minkowski_difference(self, A, B):
-        S = []
-        
-        for A_vector in A:
-            for B_vector in B:
-                S.append(A_vector - B_vector)
+        for vector1 in P:
+            for vector2 in Q:
+                S.append(vector1 + vector2)
         
         return np.array(S)
     
-    def generate_minkowski_sum_plot(self):
+    def generate_minkowski_plot(self):
         for polygon in self.polygons:
-            self.visualize_minkowski(self.rectangle, polygon, self.minkowski_sums(self.rectangle, polygon), self.ax)
+            self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
+            self.visualize_minkowski(self.minkowski_algorithm(polygon), self.ax)
 
-minkowskiPlot = MinkowskiPlot(f, ax)
-minkowskiPlot.generate_minkowski_sum_plot()
+minkowskiPlot = MinkowskiPlot(f, ax, rotation_angle = 0)
+minkowskiPlot.generate_minkowski_plot()
 plt.show()
