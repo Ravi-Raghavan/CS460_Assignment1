@@ -23,7 +23,7 @@ class MinkowskiPlot:
         self.rotation_angle = rotation_angle
         
         #Load Polygon Data
-        self.polygons = np.load("rr1133-mmh255/polygons_scene4.npy", allow_pickle= True)
+        self.polygons = np.load("rr1133-mmh255/polygons_scene1.npy", allow_pickle= True)
         
         #Pre-process polygon list to numpy array, just-in-case
         for index, polygon in enumerate(self.polygons):
@@ -142,5 +142,5 @@ class MinkowskiPlot:
 
 minkowskiPlot = MinkowskiPlot(f, ax, rotation_angle = 0)
 minkowskiPlot.optimized_generate_minkowski_plot()
-# minkowskiPlot.generate_minkowski_plot()
+minkowskiPlot.generate_minkowski_plot()
 plt.show()
