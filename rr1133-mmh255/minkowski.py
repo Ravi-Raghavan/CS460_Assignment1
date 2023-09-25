@@ -66,17 +66,14 @@ class MinkowskiPlot:
         return np.array(S)
     
     def generate_minkowski_plot(self):
-        for polygon in self.polygons[0:1]:
+        for polygon in self.polygons:
             self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
             self.visualize_minkowski(self.minkowski_algorithm(polygon), self.ax)
 
     
     def optimized_visualize_minkowski(self, S, ax):
-        # ax.plot(np.append(S[:, 0], S[0, 0]), 
-        #         np.append(S[:, 1], S[0, 1]), color='blue')
-        hull = ConvexHull(S)
-        ax.plot(np.append(hull.points[hull.vertices, 0], hull.points[hull.vertices[0], 0]), 
-                np.append(hull.points[hull.vertices, 1], hull.points[hull.vertices[0], 1]), color='blue')
+        ax.plot(np.append(S[:, 0], S[0, 0]), 
+                np.append(S[:, 1], S[0, 1]), color='blue')
 
     
     #Optimized Version of Minkowski Algorithm
@@ -117,7 +114,7 @@ class MinkowskiPlot:
         return np.array(S)
         
     def optimized_generate_minkowski_plot(self):
-        for polygon in self.polygons[0:1]:
+        for polygon in self.polygons:
             self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
             self.optimized_visualize_minkowski(self.optimized_minkowski_algorithm(polygon), self.ax)
 
