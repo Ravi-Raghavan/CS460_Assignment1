@@ -47,13 +47,14 @@ class MinkowskiPlot:
 
         return np.vstack((bottom_right, top_right, top_left, bottom_left))
 
+    #Visualize Minkowski
     def visualize_minkowski(self, S, ax):
         """Visualize the Minkowski sum S."""
         hull = ConvexHull(S)
         ax.plot(np.append(hull.points[hull.vertices, 0], hull.points[hull.vertices[0], 0]), 
                 np.append(hull.points[hull.vertices, 1], hull.points[hull.vertices[0], 1]), color='green')
 
-    #algorithm to compute minkowski sum
+    #Algorithm to compute minkowski sum
     def minkowski_algorithm(self, polygon):
         P = polygon
         Q = -1 * self.rectangle
@@ -65,12 +66,14 @@ class MinkowskiPlot:
         
         return np.array(S)
     
+    #Generating Minkowski Plot
     def generate_minkowski_plot(self):
         for polygon in self.polygons:
             self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
             self.visualize_minkowski(self.minkowski_algorithm(polygon), self.ax)
 
     
+    #Optimized Version of Visualizing Minkowski
     def optimized_visualize_minkowski(self, S, ax):
         ax.plot(np.append(S[:, 0], S[0, 0]), 
                 np.append(S[:, 1], S[0, 1]), color='blue')
@@ -113,6 +116,7 @@ class MinkowskiPlot:
                          
         return np.array(S)
         
+    #Optimized verison of generation of Minkowski Plot
     def optimized_generate_minkowski_plot(self):
         for polygon in self.polygons:
             self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
