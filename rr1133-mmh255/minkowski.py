@@ -23,7 +23,12 @@ class MinkowskiPlot:
         self.rotation_angle = rotation_angle
         
         #Load Polygon Data
-        self.polygons = np.load("rr1133-mmh255/2d_rigid_body.npy", allow_pickle= True)
+        self.polygons = np.load("rr1133-mmh255/polygons_scene4.npy", allow_pickle= True)
+        
+        #Pre-process polygon list to numpy array, just-in-case
+        for index, polygon in enumerate(self.polygons):
+            polygon = [list(vertex) for vertex in polygon]
+            self.polygons[index] = np.array(polygon)
 
         #Generate Starting Configuration for Rectangle with configuration at origin
         self.rectangle = self.random_rectangle_configuration(self.generate_rectangle())        
