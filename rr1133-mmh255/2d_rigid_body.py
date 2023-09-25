@@ -49,14 +49,10 @@ class RigidBody:
         for vertex in rectangle:
             if vertex[0] <= 0 or vertex[0] >= 2 or vertex[1] <= 0 or vertex[1] >= 2:
                 return True
-        
         return False
-
+    
     #Rotate rectangle about center
     def rotate_about_center(self, event):
-        print("------------------ROTATION-----------------------")
-        print(f"Start, Rotation Angle: {self.rotation_angle}, Center Point: {self.center_point}, bottom_right: {self.rectangle[0]}, bottom_left: {self.rectangle[-1]}")
-        
         #Change angle of rotation
         delta_rotation_angle = 10 if event == "up" else -10
         new_rotation_angle = self.rotation_angle + delta_rotation_angle
@@ -72,38 +68,32 @@ class RigidBody:
         if not (self.collides_with_other_polygons(new_rectangle) or self.is_rectangle_on_boundary(new_rectangle)):
             self.rectangle = new_rectangle
             self.rotation_angle = new_rotation_angle
-        
-        print(f"End, Rotation Angle: {self.rotation_angle}, Center Point: {self.center_point}, bottom_right: {self.rectangle[0]}, bottom_left: {self.rectangle[-1]}")
-        print("-------------------------------------------------")
 
     def translate_rectangle(self, event):
-        print("------------------TRANSLATION-----------------------")
-        print(f"Start, Rotation Angle: {self.rotation_angle}, Center Point: {self.center_point}, bottom_right: {self.rectangle[0]}, bottom_left: {self.rectangle[-1]}")
-        
         #r: total translation across x and y
         r = 0.05
-        delta_center_point = None 
+        angle_of_rotation = self.rotation_angle if event == "right" else self.rotation_angle - 180
+        delta = np.array([r * np.cos(np.deg2rad(angle_of_rotation)), r * np.sin(np.deg2rad(angle_of_rotation)), 1])
         
-        #right means g
-        if event == "right":
-            delta_cx = r * np.cos(np.deg2rad(self.rotation_angle))
-            delta_cy = r * np.sin(np.deg2rad(self.rotation_angle))
-            delta_center_point = np.array([delta_cx, delta_cy])
-        elif event == "left":
-            delta_cx = r * np.cos(np.deg2rad(self.rotation_angle - 180))
-            delta_cy = r * np.sin(np.deg2rad(self.rotation_angle - 180))
-            delta_center_point = np.array([delta_cx, delta_cy])
-
-        self.center_point += delta_center_point
-        self.rectangle += delta_center_point
+        #Form the Translation Matrix
+        translation_matrix = np.identity(3)
+        translation_matrix[:, -1] = delta
         
-        if (self.collides_with_other_polygons(self.rectangle) or self.is_rectangle_on_boundary(self.rectangle)):
-            self.center_point -= delta_center_point
-            self.rectangle -= delta_center_point
+        #Modify the Center of the Rectangle using the translation matrix
+        modified_center_point = np.vstack((self.center_point.reshape(-1, 1), np.array([[1]])))
+        modified_center_point = translation_matrix @ modified_center_point
+        modified_center_point = modified_center_point.flatten()[:-1]
+        
+        #Modify the Rectangle Vertices using the translation matrix
+        modified_rectangle = np.hstack((self.rectangle, np.ones(shape = (self.rectangle.shape[0], 1)))).T
+        modified_rectangle = (translation_matrix @ modified_rectangle).T
+        modified_rectangle = modified_rectangle[:, :-1]
+        
+        if not (self.collides_with_other_polygons(modified_rectangle) or self.is_rectangle_on_boundary(modified_rectangle)):
+            self.center_point = modified_center_point
+            self.rectangle = modified_rectangle
         
         self.body_centroid[0].set_data([self.center_point[0], self.center_point[1]])
-        print(f"End, Rotation Angle: {self.rotation_angle}, Center Point: {self.center_point}, bottom_right: {self.rectangle[0]}, bottom_left: {self.rectangle[-1]}")
-        print("-------------------------------------------------")
              
     #Rotate and Translate the Default Rectangle by a given angle and translation amount
     def random_rectangle_configuration(self, rectangle):
@@ -117,12 +107,10 @@ class RigidBody:
     def generate_rectangle(self):
         w = 0.2
         h = 0.1
-        
         top_left = np.array([-1 * w/2, h/2])
         top_right = np.array([w/2, h/2])
         bottom_left = np.array([-1 * w/2, -1 * h/2])
         bottom_right = np.array([w/2, -1 * h/2])
-
         return np.vstack((bottom_right, top_right, top_left, bottom_left))
 
     #Check to see if the rigid body collides with other polygons in our list
@@ -136,11 +124,9 @@ class RigidBody:
     def keyboard_event_handler(self, event):
         if event.key == "up" or event.key == 'down':
             self.rotate_about_center(event.key)
-            print(f"RECTANGLE: {self.rectangle}")
             self.rectangle_patch.set_xy(self.rectangle)
         elif event.key == 'right' or event.key == 'left':
             self.translate_rectangle(event.key)
-            print(f"RECTANGLE: {self.rectangle}")
             self.rectangle_patch.set_xy(self.rectangle)
         
         self.f.canvas.draw()
