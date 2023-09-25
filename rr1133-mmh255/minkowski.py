@@ -23,7 +23,7 @@ class MinkowskiPlot:
         self.rotation_angle = rotation_angle
         
         #Load Polygon Data
-        self.polygons = np.load("rr1133-mmh255/polygons_scene1.npy", allow_pickle= True)
+        self.polygons = np.load("rr1133-mmh255/polygons_scene9.npy", allow_pickle= True)
         
         #Pre-process polygon list to numpy array, just-in-case
         for index, polygon in enumerate(self.polygons):
@@ -73,7 +73,7 @@ class MinkowskiPlot:
     
     #Generating Minkowski Plot
     def generate_minkowski_plot(self):
-        for polygon in self.polygons:
+        for polygon in self.polygons[:1]:
             self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
             self.visualize_minkowski(self.minkowski_algorithm(polygon), self.ax)
 
@@ -87,7 +87,7 @@ class MinkowskiPlot:
     #Optimized Version of Minkowski Algorithm
     def optimized_minkowski_algorithm(self, polygon):
         #Goal is to compute Minowski Sum of P and Q
-        P, Q = polygon[:-1, :], -1 * self.rectangle 
+        P, Q = polygon, -1 * self.rectangle 
         
         #Get starting pointers for P and Q
         P_pointers, Q_pointers = np.where(P[:, 1] == np.min(P[:, 1]))[0], np.where(Q[:, 1] == np.min(Q[:, 1]))[0]
@@ -97,7 +97,7 @@ class MinkowskiPlot:
         #Initialize S
         S = []
         previous_P_phi, previous_Q_phi = None, None
-                
+                 
         #Iterate
         while P_count < P.shape[0] or Q_count < Q.shape[0]:
             #Sum up the two vertices and store it in S
