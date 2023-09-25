@@ -25,3 +25,12 @@ M[:, -1] = D
 print(M)
 
 print(T.flatten()[: -1])
+
+C = np.array([1, 1, 2, 3, 4])
+print(np.argmin(C))
+print(np.where(C == 1))
+
+
+D = np.array([[1, 2], [3, -1], [5, -1]])
+print(D[:, 1].flatten() == np.min(D[:, 1]))
+print(np.where(D[:, 1].flatten() == np.min(D[:, 1].flatten())))

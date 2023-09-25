@@ -1,1 +1,1 @@
-        # ax.legend()
+minkowskiPlot.generate_minkowski_plot()

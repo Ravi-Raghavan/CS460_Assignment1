@@ -81,24 +81,38 @@ class MinkowskiPlot:
     
     #Optimized Version of Minkowski Algorithm
     def optimized_minkowski_algorithm(self, polygon):
-        P = polygon
-        Q = -1 * self.rectangle
+        #Goal is to compute Minowski Sum of P and Q
+        P, Q = polygon[:-1, :], -1 * self.rectangle 
         
-        P_pointer, Q_pointer = np.argmin(P[:, 1]), np.argmin(Q[:, 1])
+        #Get starting pointers for P and Q
+        P_pointers, Q_pointers = np.where(P[:, 1] == np.min(P[:, 1]))[0], np.where(Q[:, 1] == np.min(Q[:, 1]))[0]
+        P_pointer, Q_pointer = P_pointers[np.argmin(P[P_pointers, 0])], Q_pointers[np.argmin(Q[Q_pointers, 0])]
         P_count, Q_count = 0,0
         
+        #Initialize S
         S = []
-        
+        previous_P_phi, previous_Q_phi = None, None
+                
+        #Iterate
         while P_count < P.shape[0] or Q_count < Q.shape[0]:
-            Pi, Qj = P[P_pointer % P.shape[0]], Q[Q_pointer % Q.shape[0]]            
+            #Sum up the two vertices and store it in S
+            Pi, Qj = P[P_pointer % P.shape[0]], Q[Q_pointer % Q.shape[0]]   
             S.append(Pi + Qj)
             
+            #Get edges coming from Pi and Qj
             P_i1, Q_j1 = P[(P_pointer + 1) % P.shape[0]], Q[(Q_pointer + 1) % Q.shape[0]]
             P_edge, Q_edge = P_i1 - Pi, Q_j1 - Qj
+            
+            #Calculate polar angles. I don't want negative angles so just add 360 degrees. 
             P_phi, Q_phi = np.rad2deg(np.arctan2(P_edge[1], P_edge[0])), np.rad2deg(np.arctan2(Q_edge[1], Q_edge[0]))
             P_phi = P_phi + 360 if P_phi < 0 else P_phi
             Q_phi = Q_phi + 360 if Q_phi < 0 else Q_phi
-
+            
+            #Adjust if we have already made a full circle
+            P_phi = P_phi + 360 if previous_P_phi != None and P_phi < previous_P_phi else P_phi
+            Q_phi = Q_phi + 360 if previous_Q_phi != None and Q_phi < previous_Q_phi else Q_phi
+                        
+            #Adjust Pointer
             if P_phi < Q_phi:
                 P_pointer += 1
                 P_count += 1
@@ -111,8 +125,7 @@ class MinkowskiPlot:
                 Q_pointer += 1
                 Q_count += 1
             
-            if P_count + Q_count > P.shape[0] + Q.shape[0]:
-                break
+            previous_P_phi, previous_Q_phi = P_phi, Q_phi
                          
         return np.array(S)
         
