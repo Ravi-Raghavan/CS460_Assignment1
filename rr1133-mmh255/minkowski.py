@@ -65,9 +65,19 @@ class MinkowskiPlot:
         
         return np.array(S)
     
+    def generate_minkowski_plot(self):
+        for polygon in self.polygons[0:1]:
+            self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
+            self.visualize_minkowski(self.minkowski_algorithm(polygon), self.ax)
+
+    
     def optimized_visualize_minkowski(self, S, ax):
-        ax.plot(np.append(S[:, 0], S[0, 0]), 
-                np.append(S[:, 1], S[0, 1]), color='green')
+        # ax.plot(np.append(S[:, 0], S[0, 0]), 
+        #         np.append(S[:, 1], S[0, 1]), color='blue')
+        hull = ConvexHull(S)
+        ax.plot(np.append(hull.points[hull.vertices, 0], hull.points[hull.vertices[0], 0]), 
+                np.append(hull.points[hull.vertices, 1], hull.points[hull.vertices[0], 1]), color='blue')
+
     
     #Optimized Version of Minkowski Algorithm
     def optimized_minkowski_algorithm(self, polygon):
@@ -86,11 +96,10 @@ class MinkowskiPlot:
             P_i1, Q_j1 = P[(P_pointer + 1) % P.shape[0]], Q[(Q_pointer + 1) % Q.shape[0]]
             P_edge, Q_edge = P_i1 - Pi, Q_j1 - Qj
             P_phi, Q_phi = np.rad2deg(np.arctan2(P_edge[1], P_edge[0])), np.rad2deg(np.arctan2(Q_edge[1], Q_edge[0]))
-            
             P_phi = P_phi + 360 if P_phi < 0 else P_phi
             Q_phi = Q_phi + 360 if Q_phi < 0 else Q_phi
 
-            if (P_phi < Q_phi):
+            if P_phi < Q_phi:
                 P_pointer += 1
                 P_count += 1
             elif P_phi > Q_phi:
@@ -101,20 +110,12 @@ class MinkowskiPlot:
                 P_count += 1
                 Q_pointer += 1
                 Q_count += 1
-                
-            print(Pi, Qj, P_phi, Q_phi)
             
-            if (P_count >= 10 or Q_count >= 10):
+            if P_count + Q_count > P.shape[0] + Q.shape[0]:
                 break
-         
-                    
+                         
         return np.array(S)
-    
-    def generate_minkowski_plot(self):
-        for polygon in self.polygons:
-            self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
-            self.visualize_minkowski(self.minkowski_algorithm(polygon), self.ax)
-    
+        
     def optimized_generate_minkowski_plot(self):
         for polygon in self.polygons[0:1]:
             self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
@@ -122,4 +123,5 @@ class MinkowskiPlot:
 
 minkowskiPlot = MinkowskiPlot(f, ax, rotation_angle = 0)
 minkowskiPlot.optimized_generate_minkowski_plot()
+# minkowskiPlot.generate_minkowski_plot()
 plt.show()
