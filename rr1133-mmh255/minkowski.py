@@ -57,7 +57,6 @@ class MinkowskiPlot:
     def minkowski_algorithm(self, polygon):
         P = polygon
         Q = -1 * self.rectangle
-        
         S = []
         
         for vector1 in P:
