@@ -73,7 +73,7 @@ class MinkowskiPlot:
     
     #Generating Minkowski Plot
     def generate_minkowski_plot(self):
-        for polygon in self.polygons[:1]:
+        for polygon in self.polygons:
             self.ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='red', ec='black')
             self.visualize_minkowski(self.minkowski_algorithm(polygon), self.ax)
 
