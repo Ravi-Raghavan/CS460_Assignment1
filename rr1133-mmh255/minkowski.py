@@ -104,7 +104,7 @@ class MinkowskiPlot:
             Pi, Qj = P[P_pointer % P.shape[0]], Q[Q_pointer % Q.shape[0]]   
             S.append(Pi + Qj)
             
-            #Get edges coming from Pi and Qj
+            #Get edges Pi, P_i+1 and edge Qj, Q_j+1
             P_i1, Q_j1 = P[(P_pointer + 1) % P.shape[0]], Q[(Q_pointer + 1) % Q.shape[0]]
             P_edge, Q_edge = P_i1 - Pi, Q_j1 - Qj
             
