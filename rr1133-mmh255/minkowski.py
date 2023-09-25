@@ -87,6 +87,9 @@ class MinkowskiPlot:
             P_edge, Q_edge = P_i1 - Pi, Q_j1 - Qj
             P_phi, Q_phi = np.rad2deg(np.arctan2(P_edge[1], P_edge[0])), np.rad2deg(np.arctan2(Q_edge[1], Q_edge[0]))
             
+            P_phi = P_phi + 360 if P_phi < 0 else P_phi
+            Q_phi = Q_phi + 360 if Q_phi < 0 else Q_phi
+
             if (P_phi < Q_phi):
                 P_pointer += 1
                 P_count += 1
@@ -98,7 +101,13 @@ class MinkowskiPlot:
                 P_count += 1
                 Q_pointer += 1
                 Q_count += 1
-                                    
+                
+            print(Pi, Qj, P_phi, Q_phi)
+            
+            if (P_count >= 10 or Q_count >= 10):
+                break
+         
+                    
         return np.array(S)
     
     def generate_minkowski_plot(self):
