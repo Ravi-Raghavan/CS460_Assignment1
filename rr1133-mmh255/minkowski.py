@@ -3,6 +3,10 @@ import matplotlib
 import matplotlib.pyplot as plt
 from scipy.spatial import ConvexHull
 from collision_checking import *
+import platform
+
+#Print python version for sanity check
+print(platform.python_version())
 
 #Print Matplotlib version for sanity
 print(f"matplotlib version: {matplotlib.__version__}")
