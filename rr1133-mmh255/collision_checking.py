@@ -4,6 +4,8 @@ import matplotlib.pyplot as plt
 #given a polygon as numpy array, get its edges as an array
 def get_edges(polygon):
     V = polygon.shape[0]
+    
+    #subtract 1 because first and last vertex is repeated
     edges = [[polygon[i], polygon[i + 1]] for i in range(V - 1)]
     return edges
 
