@@ -1,1 +1,1 @@
-minkowskiPlot.generate_minkowski_plot()
+        print(modified_rectangle.shape)

@@ -68,6 +68,30 @@ class RigidBody:
         if not (self.collides_with_other_polygons(new_rectangle) or self.is_rectangle_on_boundary(new_rectangle)):
             self.rectangle = new_rectangle
             self.rotation_angle = new_rotation_angle
+    
+    #Rewriting the rotation algorithm
+    def rotate_about_center_2(self, event):
+        #Change angle of rotation
+        delta_rotation_angle = 10 if event == "up" else -10
+        
+        #Set up new rotation angle
+        new_rotation_angle = self.rotation_angle + delta_rotation_angle
+        new_rotation_angle = new_rotation_angle + 360 if new_rotation_angle < 0 else new_rotation_angle
+        new_rotation_angle = new_rotation_angle % 360
+                
+        #Modify the Rectangle
+        modified_rectangle = self.rectangle - self.center_point
+        modified_rectangle = np.hstack((modified_rectangle, np.ones(shape = (modified_rectangle.shape[0], 1)))).T
+
+        #Rotate the Rectangle
+        angle = np.deg2rad(delta_rotation_angle)
+        rotation_matrix = np.array([[np.cos(angle), -1 * np.sin(angle), self.center_point[0]], [np.sin(angle), np.cos(angle), self.center_point[1]], [0, 0, 1]])
+        new_rectangle = (rotation_matrix @ modified_rectangle).T 
+        new_rectangle = new_rectangle[:, :-1]
+        
+        if not (self.collides_with_other_polygons(new_rectangle) or self.is_rectangle_on_boundary(new_rectangle)):
+            self.rectangle = new_rectangle
+            self.rotation_angle = new_rotation_angle
 
     def translate_rectangle(self, event):
         #r: total translation across x and y
@@ -123,7 +147,7 @@ class RigidBody:
     # Event handler to change the rotation angle
     def keyboard_event_handler(self, event):
         if event.key == "up" or event.key == 'down':
-            self.rotate_about_center(event.key)
+            self.rotate_about_center_2(event.key)
             self.rectangle_patch.set_xy(self.rectangle)
         elif event.key == 'right' or event.key == 'left':
             self.translate_rectangle(event.key)
