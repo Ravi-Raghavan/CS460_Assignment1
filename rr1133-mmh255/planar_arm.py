@@ -60,11 +60,11 @@ class PlanarArm:
         self.robot.append(np.array(self.get_link((x2,y2), -0.05, self.theta2, self.radius*2, self.radius*2)))
 
         # adds links to plot
-        self.generate_link(self.robot[0], False)
-        self.generate_link(self.robot[1], False)
-        self.generate_link(self.robot[2], True)
-        self.generate_link(self.robot[3], True)
-        self.generate_link(self.robot[4], True)
+        self.generate_link(np.array(self.robot[0]), False)
+        self.generate_link(np.array(self.robot[1]), False)
+        self.generate_link(np.array(self.robot[2]), True)
+        self.generate_link(np.array(self.robot[3]), True)
+        self.generate_link(np.array(self.robot[4]), True)
 
         # draw 
         self.plot_polygons()
@@ -78,7 +78,7 @@ class PlanarArm:
         if self.start:
             for part in self.robot:
                 self.start_collision(part)   
-            self.start = False
+        self.start = False
 
         # adds polygons to map
         for polygon in self.polygons:
@@ -131,13 +131,12 @@ class PlanarArm:
         return rectangle 
 
     # checks for any start collisions and removes them
-    def start_collision(self, box):
-        new_polygons = self.polygons
+    def start_collision(self, part):
+        to_delete = []
         for i, polygon in enumerate(self.polygons):
-            if collides_optimized(box, polygon):
-                if self.start :
-                    new_polygons = np.delete(self.polygons, i, 0)
-        self.polygons =  new_polygons
+            if collides_optimized(part, polygon):
+                to_delete.append(i)
+        self.polygons= np.delete(self.polygons, to_delete, 0)
 
     # checks if polygon collision is detected (if yes, revert robot)
     def check_collisions(self, prev_theta1, prev_theta2):
@@ -176,6 +175,17 @@ class PlanarArm:
 
         # check for collisions 
         self.check_collisions(prev_theta1, prev_theta2)
+
+    # use start environment to visualize the workspace? configuration space?
+   # def occupancy_grid(self):
+        # divide 2pi/100
+        # 100 x 100 grid, each cell = value of 2 joint angles
+        # YELLOW = collisions with polygonal obstacles
+        # x = first joint
+        # y = second joint
+        # how to create grid filled with color??? 
+        # get
+
 
 # display plot
 fig, ax = plt.subplots()
