@@ -149,7 +149,7 @@ def collides_optimized(poly1, poly2):
         return SAT(poly1, poly2)
 
 ## Given polygons in a scene, use the collision detection algorithm to color them if they collide. If they don't collide with anything, don't color the polygon. 
-def plot(polys, output_file_name = "Problem2_scene.jpg"):
+def plot(polys, output_file_name = "Problem2_scene.jpg", display_plot = False):
     #Code to be used for plotting figures as assignment requests
     fig, ax = plt.subplots(dpi = 100)
     ax.set_aspect("equal")
@@ -180,4 +180,6 @@ def plot(polys, output_file_name = "Problem2_scene.jpg"):
 
     # Save the plot to a JPG file
     plt.savefig(output_file_name)
-    plt.show()
+    
+    if display_plot:
+        plt.show()

@@ -3,27 +3,9 @@ import matplotlib.pyplot as plt
 from collision_checking import *
 
 #Testing this on multiple polygon scenes
-polygons = np.load("rr1133-mmh255/polygons_scene8.npy", allow_pickle= True)
+scenes = ["scene.npy", "scene2.npy", "scene3.npy", "scene4.npy", "scene5.npy", "scene6.npy", "scene7.npy", "scene8.npy"]
 
-fig, ax = plt.subplots(dpi = 100)
-ax.set_aspect("equal")
-
-for index1 in range(len(polygons)):
-    polygon = polygons[index1]
-    collision_polygon = False
-    
-    for index2 in range(len(polygons)):
-        if (index1 == index2):
-            continue
-        
-        if (collides_optimized(polygon, polygons[index2])):
-            collision_polygon = True
-            break
-    
-    if collision_polygon:
-        ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='gray', ec='black')
-    else:
-        ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='white', ec='black')
-
-
-plt.show()
+for index, scene in enumerate(scenes):
+    polygons = np.load(f"rr1133-mmh255/{scene}", allow_pickle = True)
+    file_name = f"Problem2_scene{index}.jpg"
+    plot(polygons, file_name, False)
