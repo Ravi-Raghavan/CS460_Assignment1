@@ -147,4 +147,37 @@ def collides_optimized(poly1, poly2):
     bounding_boxes = [np.array([np.min(polygon, axis=0), np.max(polygon, axis=0)]) for polygon in [poly1, poly2]]
     if (check_collision(bounding_boxes[0], bounding_boxes[1])):
         return SAT(poly1, poly2)
-    
+
+## Given polygons in a scene, use the collision detection algorithm to color them if they collide. If they don't collide with anything, don't color the polygon. 
+def plot(polys, output_file_name = "Problem2_scene.jpg"):
+    #Code to be used for plotting figures as assignment requests
+    fig, ax = plt.subplots(dpi = 100)
+    ax.set_aspect("equal")
+
+    #for each polygon check to see if collides with other polygons
+    for index1 in range(len(polys)):
+        polygon = polys[index1]
+        collision_polygon = False
+        
+        # check the other polygons to see if it collides
+        for index2 in range(len(polys)):
+            
+            #don't compare same polygon with itself
+            if (index1 == index2):
+                continue
+            
+            #call collision detection algorithm
+            if (collides_optimized(polygon, polys[index2])):
+                collision_polygon = True
+                break
+        
+        #if collides, fill it with shade. If no collision, don't shade it in 
+        if collision_polygon:
+            ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='gray', ec='black')
+        else:
+            ax.fill([vertex[0] for vertex in polygon], [vertex[1] for vertex in polygon], alpha=.25, fc='white', ec='black')
+
+
+    # Save the plot to a JPG file
+    plt.savefig(output_file_name)
+    plt.show()
