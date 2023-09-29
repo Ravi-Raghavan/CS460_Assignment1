@@ -1,7 +1,11 @@
 import numpy as np 
 import matplotlib.pyplot as plt
+from scipy.spatial import ConvexHull
 
 #given a polygon as numpy array, get its edges as an array
+#CONFIRMED WORKS
+#Expected Format of Input: "polygon" is an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+#Returns: list of form [edge 1, edge 2, ...., edge n] where edge i is of the form [vertex i, vertex i + 1]
 def get_edges(polygon):
     V = polygon.shape[0]
     
@@ -9,24 +13,43 @@ def get_edges(polygon):
     edges = [[polygon[i], polygon[i + 1]] for i in range(V - 1)]
     return edges
 
-#calculate determinant of 2 x 2 matrix
+#calculate determinant of 2 x 2 A
 def determinant(A):
     return (A[1, 1] * A[0, 0]) - (A[0, 1] * A[1, 0])
 
 #calculate Euclidean Distance between two points
+#point1 is of form [x1, y1] and point2 is of form [x2, y2]
 def euclidean_distance(point1, point2):
     return np.sqrt((point2[1] - point1[1]) ** 2 + (point2[0] - point1[0]) ** 2)
 
 #determine if edge is on point
-def point_on_edge(edge, point, epsilon = 1e-50):
-    return (euclidean_distance(edge[0], point) + euclidean_distance(edge[1], point) - euclidean_distance(edge[0], edge[1])) < epsilon
+#edge is of form [vertex i, vertex i + 1]
+#point is of form [x1, y1]
+def point_on_edge(edge, point):
+    point1, point2 = edge[0], edge[1]
+    m = (point2[1] - point1[1]) / (point2[0] - point1[0])
+    
+    #x range on the edge
+    min_x, max_x = min(point1[0], point2[0]), max(point1[0], point2[0])
+    
+    #y range on edge    
+    min_y, max_y = min(point1[1], point2[1]), max(point1[1], point2[1])
+    
+    b = point2[1] - (m * point2[0])
+    
+    inRange = min_x <= point[0] and point[0] <= max_x and min_y <= point[1] and point[1] <= max_y
+    onEdge = (point[1] == b + m * point[0])
+    return inRange and onEdge
 
 #Given two polygons, check to see if a point is contained within a polygon
+#"polygon" is an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+#"point" is of form [x1, y1]
 def point_contained(poly, point):
-    center = poly[0]
-    angles = []
+    center = poly[0] #center of polar system we are using for reference
+    angles = [] #store list of angles we calculate to divide the polygon into sections
     special_case_phi = False #Case where our angles go from 4th quadrant to 1st quadrant
     
+    #iterate through all the vertices aside from 'center'
     for vertex in poly[1: -1]:
         relative_point = vertex - center
         phi = np.rad2deg(np.arctan2(relative_point[1], relative_point[0]))
@@ -41,10 +64,15 @@ def point_contained(poly, point):
             
         angles.append(phi)
     
+    #Calculate vector from center point to the point of interest. Also calculate the angle this makes with respect to the horizontal axis emitted from our center point
     relative_point = point - center
     point_phi = np.rad2deg(np.arctan2(relative_point[1], relative_point[0]))
-    point_phi = point_phi + 360 if point_phi < 0 or special_case_phi else point_phi
     
+    #Adjust the angle of point_phi accordingly
+    point_phi = point_phi + 360 if point_phi < 0 else point_phi #First get it within the [0, 360] range
+    point_phi = point_phi + 360 if special_case_phi else point_phi #Now adjust for the fact that we may have gone past the origin in our circle
+    
+    #Apply a binary search
     index = np.searchsorted(angles, point_phi)
     if (index == len(angles) or (index == 0 and point_phi < angles[0])):
         return False
@@ -112,6 +140,7 @@ def check_collision(bbox1, bbox2):
     
 
 #returns True if a collision has been detected, else returns False
+#Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
 def SAT(poly1, poly2):
     poly1_edges = get_edges(poly1)
     poly2_edges = get_edges(poly2)
@@ -143,13 +172,14 @@ def SAT(poly1, poly2):
     return True
 
 ## Optimized Approach for Detecting Polygon Collision
+#Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
 def collides_optimized(poly1, poly2):
     bounding_boxes = [np.array([np.min(polygon, axis=0), np.max(polygon, axis=0)]) for polygon in [poly1, poly2]]
     if (check_collision(bounding_boxes[0], bounding_boxes[1])):
         return SAT(poly1, poly2)
 
 ## Given polygons in a scene, use the collision detection algorithm to color them if they collide. If they don't collide with anything, don't color the polygon. 
-def plot(polys, output_file_name = "Problem2_scene.jpg", display_plot = False):
+def plot(polys, output_file_name = "Problem2_scene.jpg", display_plot = False, print_diagnostics = False):
     #Code to be used for plotting figures as assignment requests
     fig, ax = plt.subplots(dpi = 100)
     ax.set_aspect("equal")
@@ -167,7 +197,7 @@ def plot(polys, output_file_name = "Problem2_scene.jpg", display_plot = False):
                 continue
             
             #call collision detection algorithm
-            if (collides_optimized(polygon, polys[index2])):
+            if (collides_optimized_alternative(polygon, polys[index2])):
                 collision_polygon = True
                 break
         
@@ -183,3 +213,88 @@ def plot(polys, output_file_name = "Problem2_scene.jpg", display_plot = False):
     
     if display_plot:
         plt.show()
+
+
+#Optimized Version to Compute Minkowski Difference
+def minkowski_difference_optimized(P, Q):
+    #Goal is to compute Minowski Sum of P and -Q
+    P, Q = P[:-1], Q[:-1]
+    P, Q = P, -1 * Q 
+        
+    #Get starting pointers for P and Q
+    P_pointers, Q_pointers = np.where(P[:, 1] == np.min(P[:, 1]))[0], np.where(Q[:, 1] == np.min(Q[:, 1]))[0]
+    P_pointer, Q_pointer = P_pointers[np.argmin(P[P_pointers, 0])], Q_pointers[np.argmin(Q[Q_pointers, 0])]
+    P_count, Q_count = 0,0
+        
+    #Initialize S
+    S = []
+    previous_P_phi, previous_Q_phi = None, None
+                 
+    #Iterate
+    while P_count < P.shape[0] or Q_count < Q.shape[0]:
+        #Sum up the two vertices and store it in S
+        Pi, Qj = P[P_pointer % P.shape[0]], Q[Q_pointer % Q.shape[0]]   
+        S.append(Pi + Qj)
+            
+        #Get edges Pi, P_i+1 and edge Qj, Q_j+1
+        P_i1, Q_j1 = P[(P_pointer + 1) % P.shape[0]], Q[(Q_pointer + 1) % Q.shape[0]]
+        P_edge, Q_edge = P_i1 - Pi, Q_j1 - Qj
+            
+        #Calculate polar angles. I don't want negative angles so just add 360 degrees. 
+        P_phi, Q_phi = np.rad2deg(np.arctan2(P_edge[1], P_edge[0])), np.rad2deg(np.arctan2(Q_edge[1], Q_edge[0]))
+        P_phi = P_phi + 360 if P_phi < 0 else P_phi
+        Q_phi = Q_phi + 360 if Q_phi < 0 else Q_phi
+            
+        #Adjust if we have already made a full circle
+        P_phi = P_phi + 360 if previous_P_phi != None and P_phi < previous_P_phi else P_phi
+        Q_phi = Q_phi + 360 if previous_Q_phi != None and Q_phi < previous_Q_phi else Q_phi
+                        
+        #Adjust Pointer
+        if P_phi < Q_phi:
+            P_pointer += 1
+            P_count += 1
+        elif P_phi > Q_phi:
+            Q_pointer += 1
+            Q_count += 1
+        else:
+            P_pointer += 1
+            P_count += 1
+            Q_pointer += 1
+            Q_count += 1
+            
+        previous_P_phi, previous_Q_phi = P_phi, Q_phi
+                         
+    return np.array(S)
+
+#Algorithm to compute minkowski difference
+#Given: Polygon P and Q
+#Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+def minkowski_difference(P, Q):
+    P, Q = P[:-1], Q[:-1]
+    S = []
+        
+    for vector1 in P:
+        for vector2 in Q:
+            S.append(vector1 - vector2)
+        
+    hull = ConvexHull(S)
+    return hull.points[hull.vertices]
+
+
+#Just a dummy test method. Grader can Ignore
+def compare_minkowskis(S, S2):
+    # Use the sorted indices to rearrange the original array based on the first column
+    sorted_indices = np.argsort(S[:, 0], axis = None)
+    S = S[sorted_indices]
+    
+    # Use the sorted indices to rearrange the original array based on the first column
+    sorted_indices = np.argsort(S2[:, 0], axis = None)
+    S2 = S2[sorted_indices]
+
+    return np.array_equal(S, S2)
+
+#Formulating another Collision Detection Algorithm using Minkowski Differences
+#Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+def collides_optimized_alternative(poly1, poly2):
+    S = minkowski_difference_optimized(poly1, poly2)
+    return point_contained(np.vstack((S, S[0])), np.array([0, 0]))
