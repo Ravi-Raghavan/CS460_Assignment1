@@ -96,8 +96,33 @@ Essentially, the main principle behind the Separating Axis Theorem is as follows
 
 For each edge of both polygons, I computed the normal vector to that edge. Then, I projected each polygon onto that normal vector. If there was a gap in the projections(i.e. there was no overlap in the projections), then I could conclude that there was NO intersection between the two polygons. Else, if there was no such gap, then there was an intersection between the two polygons. 
 
+\subsubsection{Alternative Optimized Approach}
+I implemented a third optimized approach which was to use Minkowski Differences to detect collisions. Given two polygons $P$ and $Q$, they collide iff their Minkowski Difference contains the origin. \newline 
+
+To compute the Minkowski Difference of polygons P and Q, the first thing I did was multiply the vertices of Polygon Q to get $-Q$. Then, I would essentially compute the Minkowski Sum of $P$ and $-Q$. \newline 
+
+To do this, I initialized a pointer to the vertex with the lowest $y$ coordinate for $P$ and $-Q$ respectively. Then, for each edge from $P$ and $-Q$ that I was on, I would compare their polar angles(i.e. angles with respect to the horizontal, positive $x$ axis). The edge that had the lower polar angle would be added to my new polygon. \newline 
+
+Once my new polygon was computed, it represented the Minkowski Difference! Now, I just had to determine if the point $(0,0)$ was contained within this new polygon. To do this, I established a new polar coordinate system where the reference point was the first vertex in the numpy array for the new polygon. Then, I calculated the angle of each of the other vertices with respect to this chosen vertex, essentially constructing a polar coordinate system with respect to the chosen vertex. Finally, I calculated the polar angle of $(0,0)$ with respect to the chosen vertex. Using binary search, I determined which "section" $(0,0)$ belonged to. If it didn't belong to any section, obviously it wasn't contained in the new polygon. However, if it did belong to any of the sections, I had to check the distance between the center point to make sure that it belonged within the polygon
+
 \subsubsection{Runtime Comparisons}
 
+\begin{tabular}{|l|c|r|r|}
+  \hline
+  Scene \# & Naive Method & Bounding Box + SAT & Minkowski Difference \\
+  \hline
+  1 & 0.0014959097 & 0.0001180410385131836 & 0.0009192705 \\
+2 & 0.0232420683 & 0.00530695915222168 & 0.0172976971 \\
+3 & 0.0033419132 & 0.0007345199584960938 & 0.0018676758 \\
+4 & 0.0036633492 & 0.002877354621887207 & 0.0023122787 \\
+5 & 0.0012435198 & 0.00011017322540283204 & 0.0009289980 \\
+6 & 0.0541827917 & 0.0084686279296875 & 0.0422564745 \\
+7 & 0.0583944321 & 0.01688053607940674 & 0.0647366762 \\
+8 & 0.0070566177 & 0.001784944534301758 & 0.0050447702 \\
+  \hline
+\end{tabular} \newline 
+
+From this table of runtime comparisons, we can observe that the Minkowski Difference algorithm performs better than the Naive Method for 7 out of 8 of the scenes. We can observe that the Bounding Box + SAT Algorithm performed better than the Naive Method for all 8 scenes. Furthermore, the Bounding Box + SAT Algorithm performed better than the Minkowski Difference for all 8 scenes. 
 
 \subsection{Polygon Scenes With Collision Detection} 
 
