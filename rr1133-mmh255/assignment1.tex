@@ -1,7 +1,9 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{float}
-\title{Assignemnt 1}
+\usepackage[section]{placeins}
+
+\title{Assignment 1}
 \date{October 8, 2023}
 \author{
   Ravi Raghavan\\
@@ -77,7 +79,88 @@ This process is repeated for all the vertices in the polygon.
 To determine the convexity of a generated polygon, the \textit{ConvexHull} function was used. The \textit{makeConvex} function takes a polygon and applies \textit{ConvexHull} to it. The result is the indices of vertices that form a convex polygon in counterclockwise order. This is stored in \textit{hull}. The indices in \textit{hull} are used to extract the vertices of the polygon that form a convex polygon into \textit{vertices}. Another vertex, the first one, is appended to \textit{vertices} so that the polygon is closed. \textit{convexPolygons} is ordered in counterclockwise order. If the given polygon is already convex, then convexPolygons will receive the same amount of vertices as the original polygon. 
 
 \section{2D collision checking for convex polygons}
+\subsection{Implementation Details} 
+To implement the collision checking approach, I had two methods. The first method was a naive method and the second method was an optimized method. I implemented this collision checking approach two ways so that I could do a comparison between both implementations to see how the optimized approach fares with respect to the overall runtime. 
+
+\subsubsection{Naive Approach}
+The naive approach I implemented was rather simplistic. The first thing I did was to check all pairs of line segments between the two polygons for collisions. Then, I checked to see if any of the vertices of one polygon are inside the other. If I had cases where there was either an intersection between one line segment from one polygon and a line segment from the other polygon or one vertex of one polygon was inside the other polygon, then I would return True to indicate that we had a collision. If I did not encounter either of these two cases, I would return False to indicate that there is NO collision.  
+
+\subsubsection{Optimized Approach}
+To implement the optimized approach, my methodology can be broken down into two major portions. Let's say we are trying to detect if Polygon P and Q collide. The first thing I did was to construct bounding boxes around each polygon. Essentially, a bounding box for a polygon is akin to drawing a rectangle around the polygon that covers all its corners \newline 
+
+Once the bounding boxes are constructed, when checking for collision, the first thing I check to see is if the bounding boxes for P and Q intersect. If no intersection is detected, I simply return False to indicate that there is NO collision. \newline 
+
+However, if there is a collision detected between the bounding boxes of P and Q, I need to verify this collision. To do this verification, I use the Separating Axis Theorem(SAT). \newline 
+
+Essentially, the main principle behind the Separating Axis Theorem is as follows. If a line/axis exists such that the projections of two polygons onto this line don't overlap, then the polygons don't collide. \newline 
+
+For each edge of both polygons, I computed the normal vector to that edge. Then, I projected each polygon onto that normal vector. If there was a gap in the projections(i.e. there was no overlap in the projections), then I could conclude that there was NO intersection between the two polygons. Else, if there was no such gap, then there was an intersection between the two polygons. 
+
+\subsubsection{Runtime Comparisons}
+
+
+\subsection{Polygon Scenes With Collision Detection} 
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene1.jpg}
+	\centering
+	\caption{First Scene for Problem 2}
+	\label{Problem2_scene1.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene2.jpg}
+	\centering
+	\caption{Second Scene for Problem 2}
+	\label{Problem2_scene2.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene3.jpg}
+	\centering
+	\caption{Third Scene for Problem 2}
+	\label{Problem2_scene3.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene4.jpg}
+	\centering
+	\caption{Fourth Scene for Problem 2}
+	\label{Problem2_scene4.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene5.jpg}
+	\centering
+	\caption{Fifth Scene for Problem 2}
+	\label{Problem2_scene5.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene6.jpg}
+	\centering
+	\caption{Sixth Scene for Problem 2}
+	\label{Problem2_scene6.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene7.jpg}
+	\centering
+	\caption{Seventh Scene for Problem 2}
+	\label{Problem2_scene7.jpg}
+\end{figure}
+
+\begin{figure}[h!]
+	\includegraphics[width= 0.9 \linewidth]{Problem2_scene8.jpg}
+	\centering
+	\caption{Eighth Scene for Problem 2}
+	\label{Problem2_scene8.jpg}
+\end{figure}
+
+
+ 
 \section{Collision-free Navigation for a 2D rigid body}
+ 
 \section{Collision-free Movement of a Planar Arm}
 \subsection{Controlling Planar Arm}
 To control the first joint, the up key increments by $\pi$/30 and the down key decrements by $\pi$/30. To control the second joint, the right key increments by $\pi$/30 and the left key decrements by $\pi$/30.
