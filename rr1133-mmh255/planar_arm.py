@@ -1,10 +1,12 @@
 import numpy as np
 import matplotlib.pyplot as plt
 from collision_checking import*
+from matplotlib.colors import ListedColormap
 from matplotlib.patches import Polygon, Circle
+import argparse
 
 class PlanarArm:
-    def __init__(self, ax):
+    def __init__(self, ax, mode):
         # initalize joint angles 
         self.theta1, self.theta2, self.radius = 0,0, 0.05
 
@@ -19,45 +21,34 @@ class PlanarArm:
         self.start = True
         
         # set up the plot axis
+        self.ax = ax
+        self.fig = ax.figure
         ax.set_xlim(0,2)
         ax.set_ylim(0,2)
         ax.set_aspect('equal')
-        self.ax = ax
-        self.fig = ax.figure
 
-        # set up environment with initial arm at (1,1) at 0 degrees
-        self.plot_arm()
+        if mode == True:
+            # set up environment with initial arm at (1,1) 
+            self.plot_arm()
+        else:
+            # display cspace for the arm and polygonal map
+            self.occupancy_grid()
 
         # connect keyboard events to event handlers
         self.fig.canvas.mpl_connect('key_press_event', self.on_key_press)
 
-    # calculates position and orientation of arm
+    # plots the 2R arm alongside polygonal map
     def plot_arm(self):
         self.ax.clear()
-        self.robot.clear()
+        self.robot.clear() # reset robot of previous position and orientation 
 
-        # inital position
-        x0,y0 = 1,1
+        # store vertices of robot
+        points = self.generate_robot()
 
-        # calculate vertices, add 0.1 to the length to account for links (radius 0.05)
-        x1 = x0 + (self.L1+.1) * np.cos(self.theta1) 
-        y1 = y0 + (self.L1+.1) * np.sin(self.theta1)
-        x2 = x1 + (self.L2+.1) * np.cos(self.theta2 + self.theta1) 
-        y2 = y1 + (self.L2+.1) * np.sin(self.theta2 + self.theta1) 
-
-        # generate arm joints
-        self.generate_joint(self.radius, x0, y0)
-        self.generate_joint(self.radius, x1, y1)
-        self.generate_joint(self.radius, x2, y2)
-
-        # generate arm links
-        self.robot.append(np.array(self.get_link((x0,y0),self.radius, self.theta1, self.L1, self.W)))
-        self.robot.append(np.array(self.get_link((x1,y1),self.radius, self.theta2+self.theta1, self.L2, self.W)))
-
-        # generate bounding boxes for joints 
-        self.robot.append(np.array(self.get_link((x0,y0),-0.05, self.theta1, self.radius*2, self.radius*2)))
-        self.robot.append(np.array(self.get_link((x1,y1), -0.05, self.theta2, self.radius*2, self.radius*2)))
-        self.robot.append(np.array(self.get_link((x2,y2), -0.05, self.theta2, self.radius*2, self.radius*2)))
+        # generate arm joints using vertices & adds to plot
+        self.generate_joint(self.radius, points[0], points[1])
+        self.generate_joint(self.radius, points[2], points[3])
+        self.generate_joint(self.radius, points[4], points[5])
 
         # adds links to plot
         self.generate_link(np.array(self.robot[0]), False)
@@ -87,12 +78,31 @@ class PlanarArm:
         #redraw
         self.fig.canvas.draw()  
 
+    def generate_robot(self):
+        # inital position
+        x0,y0 = 1,1
+
+        # calculate vertices, add 0.1 to the length to account for links (radius 0.05)
+        x1 = x0 + (self.L1+.1) * np.cos(self.theta1) 
+        y1 = y0 + (self.L1+.1) * np.sin(self.theta1)
+        x2 = x1 + (self.L2+.1) * np.cos(self.theta2 + self.theta1) 
+        y2 = y1 + (self.L2+.1) * np.sin(self.theta2 + self.theta1) 
+
+        # construct parts of robot
+        self.robot.append(np.array(self.get_link((x0,y0),self.radius, self.theta1, self.L1, self.W)))
+        self.robot.append(np.array(self.get_link((x1,y1),self.radius, self.theta2+self.theta1, self.L2, self.W)))
+        self.robot.append(np.array(self.get_link((x0,y0),-0.05, self.theta1, self.radius*2, self.radius*2)))
+        self.robot.append(np.array(self.get_link((x1,y1), -0.05, self.theta2, self.radius*2, self.radius*2)))
+        self.robot.append(np.array(self.get_link((x2,y2), -0.05, self.theta2, self.radius*2, self.radius*2)))
+
+        return [x0,y0, x1, y1, x2, y2]
+
     # generate a joint and add it to the plot
     def generate_joint(self, radius, x, y):
         circle = Circle((x,y),radius, fill = True, ec = 'blue', color = 'cornflowerblue')
         self.ax.add_patch(circle)
 
-    # generate a link (doesn't add to plot if it is a joint box)
+    # generate a link (doesn't add to plot if it is a box for a joint)
     def generate_link(self, rectangle, boundBox):
         if boundBox:
             arm1 = Polygon(rectangle)
@@ -100,7 +110,7 @@ class PlanarArm:
             arm1 = Polygon(rectangle, closed = True, ec = 'black', facecolor = 'cornflowerblue', alpha =0.5 )
             self.ax.add_patch(arm1)
 
-    # returns a rectangle -> represent rotating around a T
+    # creates a link
     def get_link(self, joint, radius,  angle, length, width):
         # initialize rectangle points (increment by radius to account for joint)
         LL = (joint[0]+radius, joint[1]-width/2)
@@ -145,8 +155,8 @@ class PlanarArm:
 
         # checks if any part of arm collides with polygon
         collision_detected = False
-        for part in self.robot:
-            for polygon in self.polygons:
+        for polygon in self.polygons:
+            for part in self.robot:
                 if collides_optimized(part, polygon):
                     collision_detected = True
                     break
@@ -157,6 +167,7 @@ class PlanarArm:
             self.theta2 = prev_theta2
             self.plot_arm() 
 
+    # increments/decrements theta1 and theta2 depending on key 
     def on_key_press(self, event):
         # hold previous joint angles
         prev_theta1 = self.theta1
@@ -173,21 +184,61 @@ class PlanarArm:
         elif event.key == 'left':
             self.theta2 -= step
 
-        # check for collisions 
+        # check for collisions (revert if one occurs)
         self.check_collisions(prev_theta1, prev_theta2)
 
-    # use start environment to visualize the workspace? configuration space?
-   # def occupancy_grid(self):
-        # divide 2pi/100
-        # 100 x 100 grid, each cell = value of 2 joint angles
-        # YELLOW = collisions with polygonal obstacles
-        # x = first joint
-        # y = second joint
-        # how to create grid filled with color??? 
-        # get
+    # compute and visualize cspace of workspace
+    def occupancy_grid(self):
+        data = np.zeros((100,100), dtype = int)
+        step = np.pi/50
 
+        # for every increment of theta1, theta2 does a full rotation
+        for x in range(100):
+            self.theta2 = 0.0
+            for y in range(100):
+                detected = False
+                # generate a new robot after each increment
+                self.robot.clear()
+                self.generate_robot()
+                # check for collisions
+                for polygon in self.polygons:
+                    for part in self.robot:
+                        if collides_optimized(part,polygon):
+                            data[x][y] = 1
+                            # if collision occured, break to check collision with other polygons
+                            detected = True
+                            if detected:
+                                 break
+                self.theta2 += step
+            self.theta1 += step
 
-# display plot
-fig, ax = plt.subplots()
-planarArm = PlanarArm(ax)
-plt.show()
+        # visualize 
+        cspace = np.transpose(data) #adjust 2D array so the plot orientation is correct
+        plt.figure(figsize=(7, 7))
+        plt.imshow(cspace, extent= (0,100, 100,0), cmap = ListedColormap(['mediumpurple', 'yellow']))
+        plt.title('Collision-Free Configuration Space')
+        plt.xlabel('Joint Angle 1')
+        plt.ylabel('Joint Angle 2')
+        plt.show()
+
+def main():
+     # create command-line argument parser
+    parser = argparse.ArgumentParser(description = 'Planar Arm Program')
+    
+    # add arguments
+    parser.add_argument('--mode', choices=['arm', 'cspace'], default='arm',
+                        help='Specify the initial mode (arm or cspace)')
+    
+    # Parse the command-line arguments
+    args = parser.parse_args()
+
+    # display and control arm OR display configuration space depending on argument
+    fig, ax = plt.subplots()
+    if args.mode == 'arm':
+        robot = PlanarArm(ax, True)
+    elif args.mode == 'cspace':
+        robot = PlanarArm(ax, False)
+    plt.show()
+
+if __name__ == "__main__":
+    main()
