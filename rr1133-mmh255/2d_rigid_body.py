@@ -8,11 +8,6 @@ import argparse
 #Print Matplotlib version for sanity
 print(f"matplotlib version: {matplotlib.__version__}")
 
-#Initialize figures and axes
-f,ax = plt.subplots(dpi = 100)
-ax.set_aspect("equal")
-
-
 # Python Class For 2D Rigid Body
 class RigidBody:
     def __init__(self, f, ax, file):
@@ -21,8 +16,11 @@ class RigidBody:
         self.ax = ax
         
         #set axis limits for x and y axes
-        ax.set_xlim(-0.01, 2.01)
-        ax.set_ylim(-0.01, 2.01)
+        ax.set_xlim(0, 2)
+        ax.set_ylim(0, 2)
+        
+        #set title for axis
+        ax.set_title('2D Rigid Body Simulation', fontsize = 12)
         
         #Load Polygon Data
         self.polygons = np.load(file, allow_pickle= True)
@@ -296,12 +294,21 @@ args = parser.parse_args()
 function_parameter = args.function
 
 if function_parameter == "Rigid":
+    #Initialize figures and axes
+    f,ax = plt.subplots(dpi = 100)
+    ax.set_aspect("equal")
+    
     file = "rr1133-mmh255/2d_rigid_body.npy"
     rigidBody = RigidBody(f, ax, file)
+    plt.show()
 elif function_parameter == "Minkowski":
-    file = "rr1133-mmh255/scene.npy"
-    minkowskiPlot = MinkowskiPlot(f, ax, rotation_angle = 45, file = file)
-    minkowskiPlot.optimized_generate_minkowski_plot()
-    minkowskiPlot.generate_minkowski_plot()
-
-plt.show()
+    for scene_number in range(1, 9):
+        file = f"rr1133-mmh255/scene.npy" if scene_number == 1 else f"rr1133-mmh255/scene{scene_number}.npy"        
+        for rotation_angle in [0, 45, 90]:
+            #Initialize figures and axes
+            f,ax = plt.subplots(dpi = 100)
+            ax.set_aspect("equal")
+            minkowskiPlot = MinkowskiPlot(f, ax, rotation_angle = rotation_angle, file = file)
+            minkowskiPlot.optimized_generate_minkowski_plot()
+            minkowskiPlot.generate_minkowski_plot()
+            plt.savefig(f"Problem3_minkowski{scene_number}_{rotation_angle}.jpg")
