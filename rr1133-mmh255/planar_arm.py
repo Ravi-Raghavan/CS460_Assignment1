@@ -5,7 +5,7 @@ from matplotlib.colors import ListedColormap
 from matplotlib.patches import Polygon, Circle
 
 class PlanarArm:
-    def __init__(self, ax, mode):
+    def __init__(self, ax):
         # initalize joint angles 
         self.theta1, self.theta2, self.radius = 0,0, 0.05
 
@@ -16,8 +16,8 @@ class PlanarArm:
         self.robot = []
 
         # load polygonal scene
-        self.polygons = np.load('scene66.npy', allow_pickle = True)
         self.start = True
+        self.polygons = np.load('arm_polygons.npy', allow_pickle = True)
         self.ax = ax
         self.fig = ax.figure
         ax.set_xlim(0,2)
@@ -218,5 +218,5 @@ class PlanarArm:
         plt.show()
 
 fig,ax = plt.subplots()
-robot = PlanarArm(ax, True)
+robot = PlanarArm(ax)
 plt.show()
