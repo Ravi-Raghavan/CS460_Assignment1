@@ -3,7 +3,6 @@ import matplotlib.pyplot as plt
 from collision_checking import*
 from matplotlib.colors import ListedColormap
 from matplotlib.patches import Polygon, Circle
-import argparse
 
 class PlanarArm:
     def __init__(self, ax, mode):
@@ -17,25 +16,22 @@ class PlanarArm:
         self.robot = []
 
         # load polygonal scene
-        self.polygons = np.load('arm_polygons.npy', allow_pickle = True)
+        self.polygons = np.load('scene66.npy', allow_pickle = True)
         self.start = True
-        
-        # set up the plot axis
         self.ax = ax
         self.fig = ax.figure
         ax.set_xlim(0,2)
         ax.set_ylim(0,2)
         ax.set_aspect('equal')
 
-        if mode == True:
-            # set up environment with initial arm at (1,1) 
-            self.plot_arm()
-        else:
-            # display cspace for the arm and polygonal map
-            self.occupancy_grid()
+        # set up environment with initial arm at (1,1) 
+        self.plot_arm()
 
         # connect keyboard events to event handlers
         self.fig.canvas.mpl_connect('key_press_event', self.on_key_press)
+
+        #display cspace for the arm and polygonal map
+        self.occupancy_grid()
 
     # plots the 2R arm alongside polygonal map
     def plot_arm(self):
@@ -221,24 +217,6 @@ class PlanarArm:
         plt.ylabel('Joint Angle 2')
         plt.show()
 
-def main():
-     # create command-line argument parser
-    parser = argparse.ArgumentParser(description = 'Planar Arm Program')
-    
-    # add arguments
-    parser.add_argument('--mode', choices=['arm', 'cspace'], default='arm',
-                        help='Specify the initial mode (arm or cspace)')
-    
-    # Parse the command-line arguments
-    args = parser.parse_args()
-
-    # display and control arm OR display configuration space depending on argument
-    fig, ax = plt.subplots()
-    if args.mode == 'arm':
-        robot = PlanarArm(ax, True)
-    elif args.mode == 'cspace':
-        robot = PlanarArm(ax, False)
-    plt.show()
-
-if __name__ == "__main__":
-    main()
+fig,ax = plt.subplots()
+robot = PlanarArm(ax, True)
+plt.show()
