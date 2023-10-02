@@ -11,7 +11,19 @@ def constructScene(P, nmin, nmax, rmin, rmax):
     
     # construct P polygons
     for _ in range(P):
-        polygons.append(constructPolygon(nmin, nmax, rmin, rmax))
+        contained = True
+        # while the polygon is NOT within (0,2), create again
+        while contained:
+            inBounds = True
+            # creates polygon and checks if vertices are within (0,2)
+            polygon = constructPolygon(nmin, nmax, rmin, rmax)
+            for vertex in polygon: 
+                if(vertex[0] >= 2 or vertex[1] >= 2 or vertex[0] <= 0 or vertex[1] <= 0):
+                    inBounds = False
+            # if polygon is within boundaries, add to polygons
+            if inBounds:
+                polygons.append(polygon)
+                contained = False;
 
     # check each polygon is convex 
     for polygon in polygons:
@@ -19,7 +31,7 @@ def constructScene(P, nmin, nmax, rmin, rmax):
 
     # save polygons to .npy file
     polygons_save = np.array(convexPolygons, dtype=object)
-    np.save('scene.npy', polygons_save)
+    np.save('scene1.npy', polygons_save)
 
     # plot the polygons
     visualize(convexPolygons)
@@ -69,3 +81,4 @@ def visualize(convexPolygons):
     ax.set(xlim = (0,2), ylim =(0,2))
     ax.set_aspect('equal')
     plt.show() 
+
