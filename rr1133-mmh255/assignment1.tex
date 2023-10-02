@@ -18,23 +18,23 @@
 \section{Generate, visualize and store 2D polygonal scenes}
 
 \subsection{Example Maps}
-The density of the maps was controlled by the amount of polygons in relation to the radii. Maps with greater radii (Fig. 1) required less polygons to fill the space compared to maps with smaller radii (Fig. 2). The shape of the polygons was controlled by the number of vertices. Maps with higher number of vertices resulted in polygons that were more round in appearance (Fig. 3 and 4). Maps with a lower amount of vertices appeared more sharp (Fig. 1 and 2). The four maps generated using \textit{constructScene} and their corresponding parameters:
+The density of the maps was controlled by the amount of polygons in relation to the radii. Maps with greater radii (Fig. 1) required less polygons to fill the space compared to maps with smaller radii (Fig. 2). The shape of the polygons was controlled by the number of vertices. Maps with higher number of vertices resulted in polygons that were more round in appearance (Fig. 3). Maps with a lower amount of vertices appeared more sharp (Fig. 1 and 2). The four maps generated using \textit{constructScene} and their corresponding parameters:
 \subsubsection{Big and Dense Polygons (see Fig. 1)}
 Number of Polygons: 10
-\\Minimum Number of Vertices: 4\space\space\space\space\space\space Maximum Number of Vertices: 6
-\\Minimum Radius: 0.3\space\space\space\space\space\space\space\space\space\space\space \space\space\space\space\space\space \space\space\space Maximum Radius: 0.4
+\\Minimum Number of Vertices: 4\space\space\space\space\space\space\space  Maximum Number of Vertices: 6
+\\Minimum Radius: 0.4\space\space\space\space\space\space\space\space\space\space\space \space\space\space\space\space\space \space\space\space\space  Maximum Radius: 0.5
 \subsubsection{Small and Dense Polygons (see Fig. 2)}
 Number of Polygons: 30 
-\\Minimum Number of Vertices: 4 \space\space\space\space\space\space Maximum Number of Vertices: 6
-\\Minimum Radius: 0.1 \space\space\space\space\space\space\space\space\space\space\space \space\space\space\space\space\space \space\space\space Maximum Radius: 0.2
+\\Minimum Number of Vertices: 4 \space\space\space\space\space\space\space  Maximum Number of Vertices: 6
+\\Minimum Radius: 0.1 \space\space\space\space\space\space\space\space \space\space\space\space \space\space\space\space\space\space \space\space\space Maximum Radius: 0.2
 \subsubsection{Small and Sparse Polygons (see Fig. 3)}
 Number of Polygons: 5
-\\Minimum Number of Vertices: 15 \space\space\space\space\space\space Maximum Number of Vertices: 20
-\\Minimum Radius: 0.05 \space\space\space\space\space\space\space\space\space\space\space \space\space\space\space\space\space \space\space\space Maximum Radius: 0.1
+\\Minimum Number of Vertices: 15 \space\space\space\space\space\space\space Maximum Number of Vertices: 20
+\\Minimum Radius: 0.05 \space\space\space\space\space\space\space\space\space\space\space\space \space\space\space\space\space\space \space\space\space Maximum Radius: 0.1
 \subsubsection{Big and Sparse Polygons (see Fig. 4)}
-Number of Polygons: 3
-\\Minimum Number of Vertices: 5 \space\space\space\space\space\space Maximum Number of Vertices: 15 
-\\Minimum Radius: 0.4 \space\space\space\space\space\space\space\space\space\space\space \space\space\space\space\space\space \space\space\space Maximum Radius: 0.6
+Number of Polygons: 2
+\\Minimum Number of Vertices: 5 \space\space\space\space\space\space\space Maximum Number of Vertices: 15 
+\\Minimum Radius: 0.5 \space\space\space\space\space\space\space\space\space\space\space \space\space\space\space\space \space\space \space\space\space Maximum Radius: 0.6
 \begin{figure}[htbp]
   \centering
   \begin{minipage}{0.45\textwidth}
@@ -50,7 +50,7 @@ Number of Polygons: 3
     \caption{Small and sparse polygons}
   \end{minipage}\hfill
   \begin{minipage}{0.45\textwidth}
-    \includegraphics[width=\linewidth]{part1_sparse_big.png}
+    \includegraphics[width=\linewidth]{part1_big_sparse.png}
     \caption{Big and sparse polygons}
   \end{minipage}
 \end{figure}
@@ -194,10 +194,10 @@ To control the first joint, the up key was for increments and the down key was f
 \begin{figure}[H]
   \centering
   \begin{minipage}{0.45\textwidth}
-    \includegraphics[scale = 0.3]{part4_without_arm.png}
+    \includegraphics[scale = 0.3]{part4_visualization.png}
   \end{minipage}\hfill
   \begin{minipage}{0.45\textwidth}
-    \includegraphics[width=\linewidth]{part4_with_arm.png}
+    \includegraphics[width=\linewidth]{part4_visualization.png}
   \end{minipage}
     \caption{Polygons that collide with arm at start are removed}
 \end{figure}
