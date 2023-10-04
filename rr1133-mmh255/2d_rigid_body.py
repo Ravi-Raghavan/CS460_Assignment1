@@ -304,14 +304,22 @@ if function_parameter == "Rigid":
 elif function_parameter == "Minkowski":
     #Initialize figures and axes
     f,ax = plt.subplots(dpi = 100)
+    
+    #Scenes that we updated to ensure that the polygon falls within the border
+    updates = [2, 4, 6, 7, 8]
+    
     for scene_number in range(1, 9):
-        file = f"rr1133-mmh255/scene.npy" if scene_number == 1 else f"rr1133-mmh255/scene{scene_number}.npy"        
+        file = f"rr1133-mmh255/scene.npy" if scene_number == 1 else f"rr1133-mmh255/scene{scene_number}.npy"
+        
+        if (scene_number in updates):
+            file = f"rr1133-mmh255/p2_scene{scene_number}.npy"
+                
         for rotation_angle in [0, 45, 90]:
             ax.set_aspect("equal")
             minkowskiPlot = MinkowskiPlot(f, ax, rotation_angle = rotation_angle, file = file)
             minkowskiPlot.optimized_generate_minkowski_plot()
             minkowskiPlot.generate_minkowski_plot()
-            plt.savefig(f"Problem3_minkowski{scene_number}_{rotation_angle}.jpg")
+            plt.savefig(f"rr1133-mmh255/Problem3_minkowski{scene_number}_{rotation_angle}.jpg")
             ax.clear()
 
     plt.close(f)

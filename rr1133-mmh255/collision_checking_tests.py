@@ -6,8 +6,17 @@ import time
 #Testing this on multiple polygon scenes
 scenes = ["scene.npy", "scene2.npy", "scene3.npy", "scene4.npy", "scene5.npy", "scene6.npy", "scene7.npy", "scene8.npy"]
 
+#Scenes that we updated to ensure that the polygon falls within the border
+updates = [2, 4, 6, 7, 8]
+
 for index, scene in enumerate(scenes):
-    polygons = np.load(f"rr1133-mmh255/{scene}", allow_pickle = True)
+    polygons = None
+    
+    if not (index + 1 in updates):
+        polygons = np.load(f"rr1133-mmh255/{scene}", allow_pickle = True)
+    else:
+        polygons = np.load(f"rr1133-mmh255/p2_{scene}", allow_pickle = True)
+        
     file_name = f"rr1133-mmh255/Problem2_scene{index + 1}.jpg"
     print_diagnostics = False
     
