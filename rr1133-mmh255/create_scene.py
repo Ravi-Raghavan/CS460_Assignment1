@@ -5,7 +5,7 @@ from scipy.spatial import ConvexHull
 import random
 
 # construct polygonal map 
-def constructScene(P, nmin, nmax, rmin, rmax):
+def constructScene(P, nmin, nmax, rmin, rmax, name):
     polygons = []
     convexPolygons = []
     
@@ -31,7 +31,7 @@ def constructScene(P, nmin, nmax, rmin, rmax):
 
     # save polygons to .npy file
     polygons_save = np.array(convexPolygons, dtype=object)
-    np.save('scene1.npy', polygons_save)
+    np.save(name, polygons_save)
 
     # plot the polygons
     visualize(convexPolygons)
@@ -81,4 +81,3 @@ def visualize(convexPolygons):
     ax.set(xlim = (0,2), ylim =(0,2))
     ax.set_aspect('equal')
     plt.show() 
-
