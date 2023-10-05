@@ -200,7 +200,7 @@ class MinkowskiPlot:
         ax.plot(np.append(hull.points[hull.vertices, 0], hull.points[hull.vertices[0], 0]), 
                 np.append(hull.points[hull.vertices, 1], hull.points[hull.vertices[0], 1]), color='green')
 
-    #Algorithm to compute minkowski sum
+    #Algorithm to compute minkowski difference
     def minkowski_algorithm(self, polygon):
         P = polygon[:-1]
         Q = -1 * self.rectangle
@@ -225,7 +225,7 @@ class MinkowskiPlot:
                 np.append(S[:, 1], S[0, 1]), color='blue')
 
     
-    #Optimized Version of Minkowski Algorithm
+    #Optimized Version of Minkowski Difference Algorithm
     def optimized_minkowski_algorithm(self, polygon):
         #Goal is to compute Minowski Sum of P and Q
         P, Q = polygon[:-1], -1 * self.rectangle 
