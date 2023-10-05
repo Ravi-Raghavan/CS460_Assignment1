@@ -13,11 +13,11 @@ for index, scene in enumerate(scenes):
     polygons = None
     
     if not (index + 1 in updates):
-        polygons = np.load(f"rr1133-mmh255/{scene}", allow_pickle = True)
+        polygons = np.load(f"{scene}", allow_pickle = True)
     else:
-        polygons = np.load(f"rr1133-mmh255/p2_{scene}", allow_pickle = True)
+        polygons = np.load(f"p2_{scene}", allow_pickle = True)
         
-    file_name = f"rr1133-mmh255/Problem2_scene{index + 1}.jpg"
+    file_name = f"Problem2_scene{index + 1}.jpg"
     print_diagnostics = False
     
     minkowski_time = 0
