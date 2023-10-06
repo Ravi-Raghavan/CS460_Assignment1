@@ -1,7 +1,6 @@
 # Project 1 Submission for Ravi Raghavan and Michelle Han
 
 # Problem 1 Files
-- create_scene_test.py: Test File for create_scene.py 
 - create_scene.py: Python Code for Problem 1
 - part1_big_dense.png: Big and dense polygons
 - part1_big_sparse.png: Big and sparse polygons
