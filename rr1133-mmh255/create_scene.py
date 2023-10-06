@@ -77,7 +77,20 @@ def makeConvex(polygon, convexPolygons):
 def visualize(convexPolygons):
     fig, ax = plt.subplots(figsize=(7,7), dpi=100)    
     for polygon in convexPolygons:
-        ax.add_patch(Polygon(polygon, closed = True, ec = 'black', facecolor = 'grey', alpha = 0.5))
+        ax.add_patch(Polygon(polygon, closed = True, ec = 'black', facecolor = 'grey', alpha = 0.2))
     ax.set(xlim = (0,2), ylim =(0,2))
     ax.set_aspect('equal')
     plt.show() 
+
+def get_input():
+    # get user input 
+    P = int(input('number of polygons: '))
+    nmin = int(input('minimum vertices: '))
+    nmax = int(input('maximum vertices: '))
+    rmin = float(input('minimum radius: '))
+    rmax = float(input('maximum radius: ')) 
+    name = (input('output file name: '))
+
+    constructScene(P,nmin,nmax,rmin,rmax,name)
+
+get_input()
