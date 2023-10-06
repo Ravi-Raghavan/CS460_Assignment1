@@ -4,19 +4,14 @@ from collision_checking import *
 import time
 
 #Testing this on multiple polygon scenes
-scenes = ["scene.npy", "scene2.npy", "scene3.npy", "scene4.npy", "scene5.npy", "scene6.npy", "scene7.npy", "scene8.npy"]
+scenes = ["scene1.npy", "scene2.npy", "scene3.npy", "scene4.npy", "scene5.npy", "scene6.npy", "scene7.npy", "scene8.npy"]
 
-#Scenes that we updated to ensure that the polygon falls within the border
-updates = [2, 4, 6, 7, 8]
+minkowski_array = []
+sat_array = []
+naive_array = []
 
 for index, scene in enumerate(scenes):
-    polygons = None
-    
-    if not (index + 1 in updates):
-        polygons = np.load(f"{scene}", allow_pickle = True)
-    else:
-        polygons = np.load(f"p2_{scene}", allow_pickle = True)
-        
+    polygons = np.load(f"p2_{scene}", allow_pickle = True)
     file_name = f"Problem2_scene{index + 1}.jpg"
     print_diagnostics = False
     
@@ -59,3 +54,27 @@ for index, scene in enumerate(scenes):
     
     # print(f"Scene #: {index + 1}, Minkowski Time: {minkowski_time:.10f}, SAT Time: {sat_time:.10f}, Naive Time: {naive_time:.10f}")
     print(f"{index + 1} & {naive_time:.10f} & {sat_time} & {minkowski_time:.10f} \\\\")
+    
+    #Append to arrays
+    minkowski_array.append(minkowski_time)
+    sat_array.append(sat_time)
+    naive_array.append(naive_time)
+
+minkowski_vs_naive = 0
+sat_vs_naive = 0
+sat_vs_minkowski = 0
+
+for index in range(len(scenes)):
+    if minkowski_array[index] < naive_array[index]:
+        minkowski_vs_naive += 1
+        
+    if sat_array[index] < naive_array[index]:
+        sat_vs_naive += 1
+    
+    if sat_array[index] < minkowski_array[index]:
+        sat_vs_minkowski += 1
+
+
+print(f"Minkowski Out Performs Naive in {minkowski_vs_naive} trials")   
+print(f"SAT Out Performs Naive in {sat_vs_naive} trials")
+print(f"SAT Out Performs Minkowski in {sat_vs_minkowski} trials")   

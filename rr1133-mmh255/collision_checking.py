@@ -13,18 +13,22 @@ def get_edges(polygon):
     edges = [[polygon[i], polygon[i + 1]] for i in range(V - 1)]
     return edges
 
-#calculate determinant of 2 x 2 A
+#calculate determinant of 2 x 2 Matrix A
+#CONFIRMED WORKS
 def determinant(A):
     return (A[1, 1] * A[0, 0]) - (A[0, 1] * A[1, 0])
 
 #calculate Euclidean Distance between two points
 #point1 is of form [x1, y1] and point2 is of form [x2, y2]
+#CONFIRMED WORKS
 def euclidean_distance(point1, point2):
     return np.sqrt((point2[1] - point1[1]) ** 2 + (point2[0] - point1[0]) ** 2)
 
 #determine if edge is on point
 #edge is of form [vertex i, vertex i + 1]
+#Each vertex is represented as a point of the form [x1, y1]
 #point is of form [x1, y1]
+#CONFIRMED WORKS
 def point_on_edge(edge, point):
     point1, point2 = edge[0], edge[1]
     m = (point2[1] - point1[1]) / (point2[0] - point1[0])
@@ -44,10 +48,11 @@ def point_on_edge(edge, point):
 #Given two polygons, check to see if a point is contained within a polygon
 #"polygon" is an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
 #"point" is of form [x1, y1]
+#CONFIRMED WORKS
 def point_contained(poly, point):
     center = poly[0] #center of polar system we are using for reference
     angles = [] #store list of angles we calculate to divide the polygon into sections
-    special_case_phi = False #Case where our angles go from 4th quadrant to 1st quadrant
+    passed_full_circle = False #keep track if we pass full circle
     
     #iterate through all the vertices aside from 'center'
     for vertex in poly[1: -1]:
@@ -57,10 +62,10 @@ def point_contained(poly, point):
         #keep value of phi between 0 and 360
         phi = phi + 360 if phi < 0 else phi
         
-        #If values start to decrease, we know we are going from 4th quadrant to 1st quadrant. In this case, simply add 360
+        #If values start to decrease, we have passed the 0 degree mark and made a full circle. In this case, simply add 360
         if (len(angles) >= 1 and phi < angles[-1]):
             phi += 360  
-            special_case_phi = True
+            passed_full_circle = True
             
         angles.append(phi)
     
@@ -69,8 +74,8 @@ def point_contained(poly, point):
     point_phi = np.rad2deg(np.arctan2(relative_point[1], relative_point[0]))
     
     #Adjust the angle of point_phi accordingly
-    point_phi = point_phi + 360 if point_phi < 0 else point_phi #First get it within the [0, 360] range
-    point_phi = point_phi + 360 if special_case_phi else point_phi #Now adjust for the fact that we may have gone past the origin in our circle
+    point_phi = point_phi + 360 if point_phi < 0 else point_phi #First get it within the [0, 360] range    
+    point_phi = point_phi + 360 if passed_full_circle and (point_phi < angles[0] or point_phi > angles[-1]) else point_phi #Now adjust for the fact that we may have gone past the origin in our circle
     
     #Apply a binary search
     index = np.searchsorted(angles, point_phi)
@@ -89,13 +94,14 @@ def point_contained(poly, point):
         
 
 #Given two edges, determine if they intersect using parameterization and Cramer's Rule
+#CONFIRMED WORKS
 def edge_intersect(edge1, edge2):
     ## Linear Segments can be written using s and t parameters. Edge 1 will be expressed using s parameter and Edge 2 will be expressed using t parameter
     
-    #Edge 1 x and y values
+    #Edge 1 x and y values. Edge 1 connects [x1, y1] to [x2, y2]
     x1, x2, y1, y2 = edge1[0][0], edge1[1][0], edge1[0][1], edge1[1][1]
     
-    #Edge 2 x and y values
+    #Edge 2 x and y values. Edge 2 connects [x3 y3] to [x4, y4]
     x3, x4, y3, y4 = edge2[0][0], edge2[1][0], edge2[0][1], edge2[1][1]
     
     #Determinants
@@ -112,6 +118,7 @@ def edge_intersect(edge1, edge2):
     return 0 <= s and s <= 1 and 0 <= t and t <= 1    
 
 ## EXHAUSTIVE APPROACH FOR DETECTING POLYGON COLLISION##
+#CONFIRMED WORKS
 def collides(poly1, poly2):
     #Check to see if each vertex in poly1 is contained in poly2
     for vertex in poly1:
@@ -131,8 +138,8 @@ def collides(poly1, poly2):
 
 
 #Check for collision between two bounding boxes
+#CONFIRMED WORKS
 def check_collision(bbox1, bbox2):
-    '''Check if two bounding boxes collide'''
     return not (bbox1[1][0] < bbox2[0][0] or 
                 bbox1[0][0] > bbox2[1][0] or 
                 bbox1[1][1] < bbox2[0][1] or 
@@ -141,6 +148,7 @@ def check_collision(bbox1, bbox2):
 
 #returns True if a collision has been detected, else returns False
 #Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+#CONFIRMED WORKS
 def SAT(poly1, poly2):
     poly1_edges = get_edges(poly1)
     poly2_edges = get_edges(poly2)
@@ -173,12 +181,14 @@ def SAT(poly1, poly2):
 
 ## Optimized Approach for Detecting Polygon Collision
 #Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+#CONFIRMED WORKS
 def collides_optimized(poly1, poly2):
     bounding_boxes = [np.array([np.min(polygon, axis=0), np.max(polygon, axis=0)]) for polygon in [poly1, poly2]]
     if (check_collision(bounding_boxes[0], bounding_boxes[1])):
         return SAT(poly1, poly2)
 
 ## Given polygons in a scene, use the collision detection algorithm to color them if they collide. If they don't collide with anything, don't color the polygon. 
+#CONFIRMED WORKS
 def plot(polys, output_file_name = "Problem2_scene.jpg", display_plot = False, save_plot = False, print_diagnostics = False, collision_detection_function = "Minkowski"):
     #Code to be used for plotting figures as assignment requests
     if save_plot or display_plot:
@@ -227,15 +237,22 @@ def plot(polys, output_file_name = "Problem2_scene.jpg", display_plot = False, s
         plt.show()
 
 
-#Optimized Version to Compute Minkowski Difference
+#Algorithm to compute minkowski difference
+#Given: Polygon P and Q
+#Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+#Optimized Version to Compute Minkowski Difference of P and Q
+#CONFIRMED WORKS
 def minkowski_difference_optimized(P, Q):
     #Goal is to compute Minowski Sum of P and -Q
     P, Q = P[:-1], Q[:-1]
     P, Q = P, -1 * Q 
         
     #Get starting pointers for P and Q
-    P_pointers, Q_pointers = np.where(P[:, 1] == np.min(P[:, 1]))[0], np.where(Q[:, 1] == np.min(Q[:, 1]))[0]
-    P_pointer, Q_pointer = P_pointers[np.argmin(P[P_pointers, 0])], Q_pointers[np.argmin(Q[Q_pointers, 0])]
+    P_y_values, Q_y_values = P[:, 1].flatten(), Q[:, 1].flatten()
+    P_pointers, Q_pointers = np.argwhere(P_y_values == np.min(P_y_values)).flatten(), np.argwhere(Q_y_values == np.min(Q_y_values)).flatten()    
+    P_pointer, Q_pointer = P_pointers[np.argmin(P[P_pointers, 0].flatten())], Q_pointers[np.argmin(Q[Q_pointers, 0].flatten())]
+    
+    #Initialize the counts for P and Q
     P_count, Q_count = 0,0
         
     #Initialize S
@@ -263,16 +280,11 @@ def minkowski_difference_optimized(P, Q):
                         
         #Adjust Pointer
         if P_phi < Q_phi:
-            P_pointer += 1
-            P_count += 1
+            P_pointer, P_count = P_pointer + 1, P_count + 1
         elif P_phi > Q_phi:
-            Q_pointer += 1
-            Q_count += 1
+            Q_pointer, Q_count = Q_pointer + 1, Q_count + 1
         else:
-            P_pointer += 1
-            P_count += 1
-            Q_pointer += 1
-            Q_count += 1
+            P_pointer, P_count, Q_pointer, Q_count = P_pointer + 1, P_count + 1, Q_pointer + 1, Q_count + 1
             
         previous_P_phi, previous_Q_phi = P_phi, Q_phi
                          
@@ -281,6 +293,7 @@ def minkowski_difference_optimized(P, Q):
 #Algorithm to compute minkowski difference
 #Given: Polygon P and Q
 #Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+#CONFIRMED WORKS
 def minkowski_difference(P, Q):
     P, Q = P[:-1], Q[:-1]
     S = []
@@ -294,6 +307,7 @@ def minkowski_difference(P, Q):
 
 
 #Just a dummy test method. This method can be ignored :) 
+#CONFIRMED WORKS
 def compare_minkowskis(S, S2):
     # Use the sorted indices to rearrange the original array based on the first column
     sorted_indices = np.argsort(S[:, 0], axis = None)
@@ -307,6 +321,7 @@ def compare_minkowskis(S, S2):
 
 #Formulating another Collision Detection Algorithm using Minkowski Differences
 #Note: both polygons are an (n + 1) x 2 array. There are n vertices in the polygon but the 1st vertex has to be repeated at the end to indicate polygon is closed
+#CONFIRMED WORKS
 def collides_optimized_alternative(poly1, poly2):
     S = minkowski_difference_optimized(poly1, poly2)
     return point_contained(np.vstack((S, S[0])), np.array([0, 0]))

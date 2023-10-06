@@ -81,7 +81,7 @@ To determine the convexity of a generated polygon, the \textit{ConvexHull} funct
 
 \section{2D collision checking for convex polygons}
 \subsection{Implementation Details} 
-To implement the collision checking approach, I had two methods. The first method was a naive method and the second method was an optimized method. I implemented this collision checking approach two ways so that I could do a comparison between both implementations to see how the optimized approach fares with respect to the overall runtime. 
+To implement the collision checking approach, I used three methods. The first method was a naive method. The second and third methods were optimized methods. I implemented this collision checking approach three ways so that I could do a comparison between all implementations to see how the optimized approaches fares with respect to the overall runtime. 
 
 \subsubsection{Naive Approach}
 The naive approach I implemented was rather simplistic. The first thing I did was to check all pairs of line segments between the two polygons for collisions. Then, I checked to see if any of the vertices of one polygon are inside the other. If I had cases where there was either an intersection between one line segment from one polygon and a line segment from the other polygon or one vertex of one polygon was inside the other polygon, then I would return True to indicate that we had a collision. If I did not encounter either of these two cases, I would return False to indicate that there is NO collision.  
@@ -100,7 +100,7 @@ For each edge of both polygons, I computed the normal vector to that edge. Then,
 \subsubsection{Alternative Optimized Approach}
 I implemented a third optimized approach which was to use Minkowski Differences to detect collisions. Given two polygons $P$ and $Q$, they collide iff their Minkowski Difference contains the origin. \newline 
 
-To compute the Minkowski Difference of polygons P and Q, the first thing I did was multiply the vertices of Polygon Q to get $-Q$. Then, I would essentially compute the Minkowski Sum of $P$ and $-Q$. \newline 
+To compute the Minkowski Difference of polygons P and Q, the first thing I did was multiply the vertices of Polygon Q by $-1$ to get $-Q$. Then, I would essentially compute the Minkowski Sum of $P$ and $-Q$. \newline 
 
 To do this, I initialized a pointer to the vertex with the lowest $y$ coordinate for $P$ and $-Q$ respectively. Then, for each edge from $P$ and $-Q$ that I was on, I would compare their polar angles(i.e. angles with respect to the horizontal, positive $x$ axis). The edge that had the lower polar angle would be added to my new polygon. \newline 
 
@@ -112,14 +112,14 @@ Once my new polygon was computed, it represented the Minkowski Difference! Now, 
   \hline
   Scene \# & Naive Method & Bounding Box + SAT & Minkowski Difference \\
   \hline
-  1 & 0.0014959097 & 0.0001180410385131836 & 0.0009192705 \\
-2 & 0.0232420683 & 0.00530695915222168 & 0.0172976971 \\
-3 & 0.0033419132 & 0.0007345199584960938 & 0.0018676758 \\
-4 & 0.0036633492 & 0.002877354621887207 & 0.0023122787 \\
-5 & 0.0012435198 & 0.00011017322540283204 & 0.0009289980 \\
-6 & 0.0541827917 & 0.0084686279296875 & 0.0422564745 \\
-7 & 0.0583944321 & 0.01688053607940674 & 0.0647366762 \\
-8 & 0.0070566177 & 0.001784944534301758 & 0.0050447702 \\
+  1 & 0.0008450031 & 0.000544428825378418 & 0.0007897854 \\
+2 & 0.0048280478 & 0.00035381317138671875 & 0.0023546457 \\
+3 & 0.0029128313 & 0.0014295339584350585 & 0.0024139881 \\
+4 & 0.0026724100 & 0.000854659080505371 & 0.0028937340 \\
+5 & 0.0011903286 & 0.00010688304901123047 & 0.0010263920 \\
+6 & 0.0106782198 & 0.0018508195877075194 & 0.0079920769 \\
+7 & 0.0032384157 & 0.0001322031021118164 & 0.0012509346 \\
+8 & 0.0073652029 & 0.00230255126953125 & 0.0050377607 \\
   \hline
 \end{tabular} \newline 
 
@@ -186,235 +186,251 @@ From this table of runtime comparisons, we can observe that the Minkowski Differ
 
  \newpage 
 \section{Collision-free Navigation for a 2D rigid body}
-\newpage
-\subsection{Minkowski Plots for Scene 1}
-\subsubsection{0 Degree Angle}
+\subsection{Instructions For Running Program}
+All the logic for Problem 3 is contained in the file 2d$\_$rigid$\_$body.py \newline 
+To run the animation of the 2D Rigid Body in an environment with Polygonal Obstacles, please do as such: \newline
+Run the following from the terminal, "python3 2d$\_$rigid$\_$body.py --function Rigid" \newline 
+
+To run the logic for Generating the Free Configuration Space, please do as such: \newline 
+Run the following from the terminal, "python3 2d$\_$rigid$\_$body.py --function Minkowski"
+
+\subsection{Rigid Body Animations}
+\begin{itemize}
+    \item Left Arrow: Move Rigid Body forward along the long axis of the rigid body
+    \item Right Arrow: Move Rigid Body backward along the long axis of the rigid body
+    \item Up Arrow: Rotate Rigid Body counterclockwise around its center
+    \item Down Arrow: Rotate Rigid Body clockwise around its center
+\end{itemize}
+
+
+\subsection{Plots of Free Configuration Space for Scene 1}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski1_0.jpg}
 	\centering
-	\caption{First Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski1_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski1_45.jpg}
 	\centering
-	\caption{First Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski1_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski1_90.jpg}
 	\centering
-	\caption{First Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski1_90.jpg}
 \end{figure}
 
 \newpage
-\subsection{Minkowski Plots for Scene 2}
-\subsubsection{0 Degree Angle}
+\subsection{Plots of Free Configuration Space for Scene 2}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski2_0.jpg}
 	\centering
-	\caption{Second Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski2_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski2_45.jpg}
 	\centering
-	\caption{Second Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski2_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski2_90.jpg}
 	\centering
-	\caption{Second Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski2_90.jpg}
 \end{figure}
 
 \newpage
-\subsection{Minkowski Plots for Scene 3}
-\subsubsection{0 Degree Angle}
+\subsection{Plots of Free Configuration Space for Scene 3}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski3_0.jpg}
 	\centering
-	\caption{Third Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski3_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski3_45.jpg}
 	\centering
-	\caption{Third Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski3_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski3_90.jpg}
 	\centering
-	\caption{Third Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski3_90.jpg}
 \end{figure}
 
 \newpage
-\subsection{Minkowski Plots for Scene 4}
-\subsubsection{0 Degree Angle}
+\subsection{Plots of Free Configuration Space for Scene 4}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski4_0.jpg}
 	\centering
-	\caption{Fourth Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski4_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski4_45.jpg}
 	\centering
-	\caption{Fourth Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski4_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski4_90.jpg}
 	\centering
-	\caption{Fourth Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski4_90.jpg}
 \end{figure}
 
 \newpage
-\subsection{Minkowski Plots for Scene 5}
-\subsubsection{0 Degree Angle}
+\subsection{Plots of Free Configuration Space for Scene 5}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski5_0.jpg}
 	\centering
-	\caption{Fifth Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski5_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski5_45.jpg}
 	\centering
-	\caption{Fifth Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski5_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski5_90.jpg}
 	\centering
-	\caption{Fifth Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski5_90.jpg}
 \end{figure}
 
 \newpage
-\subsection{Minkowski Plots for Scene 6}
-\subsubsection{0 Degree Angle}
+\subsection{Plots of Free Configuration Space for Scene 6}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski6_0.jpg}
 	\centering
-	\caption{Sixth Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski6_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski6_45.jpg}
 	\centering
-	\caption{Sixth Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski6_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski6_90.jpg}
 	\centering
-	\caption{Sixth Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski6_90.jpg}
 \end{figure}
 
 \newpage
-\subsection{Minkowski Plots for Scene 7}
-\subsubsection{0 Degree Angle}
+\subsection{Plots of Free Configuration Space for Scene 7}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski7_0.jpg}
 	\centering
-	\caption{Seventh Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski7_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski7_45.jpg}
 	\centering
-	\caption{Seventh Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski7_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski7_90.jpg}
 	\centering
-	\caption{Seventh Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski7_90.jpg}
 \end{figure}
 
 \newpage
-\subsection{Minkowski Plots for Scene 8}
-\subsubsection{0 Degree Angle}
+\subsection{Plots of Free Configuration Space for Scene 8}
+\subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski8_0.jpg}
 	\centering
-	\caption{Eighth Scene, 0 Degree Angle}
+	\caption{0 Degree Orientation for Robot}
 	\label{Problem3_minkowski8_0.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{45 Degree Angle}
+\subsubsection{Robot is Oriented at a 45 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski8_45.jpg}
 	\centering
-	\caption{Eighth Scene, 45 Degree Angle}
+	\caption{45 Degree Orientation for Robot}
 	\label{Problem3_minkowski8_45.jpg}
 \end{figure}
 
 \newpage
-\subsubsection{90 Degree Angle}
+\subsubsection{Robot is Oriented at a 90 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski8_90.jpg}
 	\centering
-	\caption{Eighth Scene, 90 Degree Angle}
+	\caption{90 Degree Orientation for Robot}
 	\label{Problem3_minkowski8_90.jpg}
 \end{figure}
 
 
- 
+\newpage 
 \section{Collision-free Movement of a Planar Arm}
 \subsection{Controlling Planar Arm}
-To control the first joint, the up key was for increments and the down key was for decrements. To control the second joint, the right key was for increments and the down key was decrements. The step size was $\pi$/30.
+To control the first joint, the up key was for increments and the down key was for decrements. To control the second joint, the right key was for increments and the left key was decrements. The step size was $\pi$/30.
 \subsection{Visualization of Scenes}
 
 \begin{figure}[H]
