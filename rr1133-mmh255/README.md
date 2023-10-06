@@ -28,7 +28,7 @@
 
 # Problem 4 Files
 - arm_example.mp4: Example Animation mp4 video given to us by instructor for Problem 4
-- arm_polygons.npy: File containing information for polygons in environment for Problem 4
+- arm_polygons.npy: Default scene provided for Problem 4
 - pt4_animation1.mp4: mp4 video of moving the planar arm
 - pt4_animation2.mp4: another mp4 video of moving planar arm
 - part4_arm_free.png: Arm collision-free
