@@ -39,6 +39,7 @@
 
 # Report Files
 - report.tex: Source latex code
+- report.pdf: PDF of latex file
 
 
 # Other Files
