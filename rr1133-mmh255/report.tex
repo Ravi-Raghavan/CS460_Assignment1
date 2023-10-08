@@ -1,6 +1,8 @@
 \documentclass{article}
 \usepackage{graphicx} % Required for inserting images
 \usepackage{float}
+\usepackage{amsmath}
+
 \usepackage[section]{placeins}
 
 \title{Assignment 1}
@@ -55,6 +57,8 @@ Number of Polygons: 2
   \end{minipage}
 \end{figure}
 
+Rationale: Parameters were chosen accordingly for each combination of small/big and sparse/dense polygons. In other words, if we wanted to generate small and sparse polygons, we chose the parameters accordingly. Likewise, if we wanted to generate big and dense polygons, we chose the parameters accordingly. 
+
 \subsection{Convex Polygon Letters}
 \begin{figure}[H]
   \centering
@@ -83,7 +87,26 @@ To determine the convexity of a generated polygon, the \textit{ConvexHull} funct
 To implement the collision checking approach, I used three methods. The first method was a naive method. The second and third methods were optimized methods. I implemented this collision checking approach three ways so that I could do a comparison between all implementations to see how the optimized approaches fares with respect to the overall runtime. 
 
 \subsubsection{Naive Approach}
-The naive approach I implemented was rather simplistic. The first thing I did was to check all pairs of line segments between the two polygons for collisions. Then, I checked to see if any of the vertices of one polygon are inside the other. If I had cases where there was either an intersection between one line segment from one polygon and a line segment from the other polygon or one vertex of one polygon was inside the other polygon, then I would return True to indicate that we had a collision. If I did not encounter either of these two cases, I would return False to indicate that there is NO collision.  
+The naive approach I implemented was rather simplistic. The first thing I did was to check all pairs of line segments(i.e. the line segments represent the edges) between the two polygons for collisions. \newline 
+
+To check if Line Segment A and Line Segment B intersect, I parameterized both line segments and solved for the point of intersection using Cramer's Rule. \newline 
+
+So, for example, if a line segment went from $(1, 2)$ to $(3, 5)$, I would parameterize this line segment as $x = 1 + 2s$ and $y = 2 + 3s$. Likewise, if the second line segment went from $(5, 6)$ to $(9, 11)$, I would parameterize this line segment as $x = 5 + 4t$ and $y = 6 + 5t$. Then, I would set the $x$ parameterized equations equal to each other and, likewise, set the $y$ parameterized equations equal to each other. Hence, my system of linear equations became: \newline 
+
+\begin{equation*}
+1 + 2s = 5 + 4t
+\end{equation*}
+
+\begin{equation*}
+2 + 3s = 6 + 5t
+\end{equation*}
+
+Solving this system of equations was done using Cramer's Rule. Once I got my solution for $s$ and $t$, if such a solution existed, then I would check to see if $0 \leq s, t \leq 1$. I want to make sure the intersection points is contained within the line segments! \newline 
+
+
+Once I finished checking the edges for collisions, I checked to see if any of the vertices of one polygon are inside the other. To check if a point $p$ was inside Polygon $A$, I picked a vertex of Polygon $A$, let's call this vertex $V$, and established a polar coordinate system centered about $V$. Then, I calculated the angle of each of the other vertices of $A$ with respect to $V$, essentially constructing a polar coordinate system with respect to the $V$. I made sure to go in counterclockwise order so that the polar angles I calculated would be in increasing order. This essentially splits up $A$ into "sections" in the polar coordinate system. Finally, I calculated the polar angle of the point $p$ with respect to $V$. Using binary search, since the polar angles are in increasing order, I determined which ”section” $p$ belonged to. If $p$ didn’t belong to any section, obviously it wasn’t contained in $A$. However, if $p$ did belong to any of the sections, I had to check the distance between $V$ and $p$ to make sure that it belonged within the polygon. If line segment from $V$ to $p$ didn't intersect $A$ or $p$ was on one of the edges of $A$, then I knew that $p$ was contained within $A$. Else, $p$ was not contained within $A$. 
+
+Overall, if I had cases where there was either an intersection between one line segment from one polygon and a line segment from the other polygon or one vertex of one polygon was inside the other polygon, then I would return True to indicate that we had a collision. If I did not encounter either of these two cases, I would return False to indicate that there is NO collision.  
 
 \subsubsection{Optimized Approach}
 To implement the optimized approach, my methodology can be broken down into two major portions. Let's say we are trying to detect if Polygon P and Q collide. The first thing I did was to construct bounding boxes around each polygon. Essentially, a bounding box for a polygon is akin to drawing a rectangle around the polygon that covers all its corners \newline 
@@ -101,9 +124,9 @@ I implemented a third optimized approach which was to use Minkowski Differences 
 
 To compute the Minkowski Difference of polygons P and Q, the first thing I did was multiply the vertices of Polygon Q by $-1$ to get $-Q$. Then, I would essentially compute the Minkowski Sum of $P$ and $-Q$. \newline 
 
-To do this, I initialized a pointer to the vertex with the lowest $y$ coordinate for $P$ and $-Q$ respectively. Then, for each edge from $P$ and $-Q$ that I was on, I would compare their polar angles(i.e. angles with respect to the horizontal, positive $x$ axis). The edge that had the lower polar angle would be added to my new polygon. \newline 
+To do this, I initialized a pointer to the vertex with the lowest $y$ coordinate for $P$ and $-Q$ respectively. Then, for each edge from $P$ and $-Q$ that I was on, I would compare their polar angles(i.e. angles with respect to the horizontal, positive $x$ axis). The edge that had the lower polar angle would be added to my new polygon. I would keep iterating through this process until all edges from both polygons were added to the new polygon. Throughout this process, the pointers would simply be incremented so I could keep track of which edge I am adding to my new polygon!\newline 
 
-Once my new polygon was computed, it represented the Minkowski Difference! Now, I just had to determine if the point $(0,0)$ was contained within this new polygon. To do this, I established a new polar coordinate system where the reference point was the first vertex in the numpy array for the new polygon. Then, I calculated the angle of each of the other vertices with respect to this chosen vertex, essentially constructing a polar coordinate system with respect to the chosen vertex. Finally, I calculated the polar angle of $(0,0)$ with respect to the chosen vertex. Using binary search, I determined which "section" $(0,0)$ belonged to. If it didn't belong to any section, obviously it wasn't contained in the new polygon. However, if it did belong to any of the sections, I had to check the distance between the center point to make sure that it belonged within the polygon
+Once my new polygon was computed, it represented the Minkowski Difference! Now, I just had to determine if the point $(0,0)$ was contained within this new polygon. To do this, I established a new polar coordinate system where the reference point was the first vertex in the numpy array for the new polygon. Let's call this reference point $V$. Then, I calculated the angle of each of the other vertices with respect to $V$, essentially constructing a polar coordinate system with respect to $V$.  I made sure to go in counterclockwise order so that the polar angles I calculated would be in increasing order. This essentially splits up the polygon into "sections" in the polar coordinate system. Finally, I calculated the polar angle of $(0,0)$ with respect to $V$. Using binary search, since our polar angles are in increasing order, I determined which "section" $(0,0)$ belonged to. If it didn't belong to any section, obviously it wasn't contained in the new polygon. However, if it did belong to any of the sections, I had to check the distance between $V$ and $(0,0)$ to make sure that it belonged within the polygon. If line segment from $V$ to $(0,0)$ didn't intersect the polygon or $(0,0)$ was on one of the edges of the polygon, then I knew that $(0,0)$ was contained within the polygon. Else, $(0,0)$ was not contained within the polygon.
 
 \subsubsection{Runtime Comparisons}
 
@@ -124,7 +147,10 @@ Once my new polygon was computed, it represented the Minkowski Difference! Now, 
 
 From this table of runtime comparisons, we can observe that the Minkowski Difference algorithm performs better than the Naive Method for 7 out of 8 of the scenes. We can observe that the Bounding Box + SAT Algorithm performed better than the Naive Method for all 8 scenes. Furthermore, the Bounding Box + SAT Algorithm performed better than the Minkowski Difference for all 8 scenes. 
 
+\newpage 
 \subsection{Polygon Scenes With Collision Detection} 
+
+Note: To generate the below scenes, I used the collision detection algorithms that we have implemented in the corresponding python files for Problem 2. Refer to the README.md for more information about where to locate these python files. 
 
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem2_scene1.jpg}
@@ -195,14 +221,19 @@ Run the following from the terminal, "python3 2d$\_$rigid$\_$body.py --function 
 
 \subsection{Rigid Body Animations}
 \begin{itemize}
-    \item Left Arrow: Move Rigid Body forward along the long axis of the rigid body
-    \item Right Arrow: Move Rigid Body backward along the long axis of the rigid body
+    \item Left Arrow: Move Rigid Body backward along the long axis of the rigid body
+    \item Right Arrow: Move Rigid Body forward along the long axis of the rigid body
     \item Up Arrow: Rotate Rigid Body counterclockwise around its center
     \item Down Arrow: Rotate Rigid Body clockwise around its center
 \end{itemize}
 
 
 \subsection{Plots of Free Configuration Space for Scene 1}
+Note to Grader: All of the following plots of the free configuration space were generated by using the Minkowski Difference Algorithm. Although the assignment stated to use the Minkowski Sum Algorithm, an important observation to make here is that our rectangular rigid body is symmetrical. Hence, using the Minkowski Sum or Minkowski Difference Algorithm are both valid approaches to computing the free configuration space! \newline 
+
+When visualizing the free configuration space, the red polygons represent the original polygonal obstacles in the original workspace. For each red polygonal obstacle, the surrounding green boundaries represent the representation of this obstacle in the Configuration Space. 
+
+
 \subsubsection{Robot is Oriented at a 0 Degree Angle}
 \begin{figure}[h!]
 	\includegraphics[width= 0.9 \linewidth]{Problem3_minkowski1_0.jpg}
